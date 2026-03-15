@@ -1,143 +1,153 @@
-import { useEffect, useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { Map } from "react-map-gl/maplibre";
 import { DeckGL } from "@deck.gl/react";
 import { GeoJsonLayer, ArcLayer } from "@deck.gl/layers";
-import { scaleQuantile } from "d3-scale";
-
-import { load } from "@loaders.gl/core";
-import { JSONLoader } from "@loaders.gl/json";
+import { scaleLinear } from "d3-scale";
 
 import type { Color, PickingInfo, MapViewState } from "@deck.gl/core";
 import type { Feature, Polygon, MultiPolygon } from "geojson";
 
 const DATA_URL =
-  "https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/arc/counties.json";
-
-export const inFlowColors: Color[] = [
-  [255, 255, 204],
-  [199, 233, 180],
-  [127, 205, 187],
-  [65, 182, 196],
-  [29, 145, 192],
-  [34, 94, 168],
-  [12, 44, 132],
-];
-export const outFlowColors: Color[] = [
-  [255, 255, 178],
-  [254, 217, 118],
-  [254, 178, 76],
-  [253, 141, 60],
-  [252, 78, 42],
-  [227, 26, 28],
-  [177, 0, 38],
-];
+  "https://raw.githubusercontent.com/jdanielgoh/traslados-migracion/refs/heads/main/public/flujos-origen-destino_desagregado.json";
 
 const INITIAL_VIEW_STATE: MapViewState = {
-  longitude: -100,
-  latitude: 40.7,
-  zoom: 3,
+  longitude: -102,
+  latitude: 23,
+  zoom: 5,
   maxZoom: 15,
-  pitch: 30,
-  bearing: 30,
+  pitch: 100,
+  bearing: 0,
 };
+const grupoEtario = "total_infancias";
+const anios = ["2018", "2019", "2020", "2021"];
 const MAP_STYLE =
-  "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json";
+  "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
 
-type CountyProperties = {
-  name: string;
-  flows: Record<string, number>;
+type MunicipioProperties = {
+  NOMGEO: string;
+  CVE_ENT: string;
+  cve_mun: string;
+  flujos: Record<string, number>;
   centroid: [number, number];
 };
-type County = Feature<Polygon | MultiPolygon, CountyProperties>;
+
+type Municipio = Feature<Polygon | MultiPolygon, MunicipioProperties>;
+
 type MigrationFlow = {
-  source: County;
-  target: County;
+  source: Municipio;
+  target: Municipio;
   value: number;
   quantile: number;
 };
 
-function calculateArcs(data: County[] | undefined, selectedCounty?: County) {
-  if (!data || !data.length) return null;
-  if (!selectedCounty)
-    selectedCounty = data.find((f) => f.properties.name === "Los Angeles, CA")!;
-  const { flows } = selectedCounty.properties;
+// Calcula arcos
+function calculateArcs(
+  data: Municipio[] | undefined,
+  selectedMunicipio?: Municipio | null,
+) {
+  if (!data || !data.length) return [];
 
-  const arcs: MigrationFlow[] = Object.keys(flows).map((toId) => {
-    const f = data[Number(toId)];
-    return {
-      source: selectedCounty!,
-      target: f,
-      value: flows[toId],
-      quantile: 0,
-    };
-  });
+  // Diccionario cve_mun -> municipio
+  const featuresById: Record<string, Municipio> = Object.fromEntries(
+    data.map((f) => [f.properties.cve_mun, f]),
+  );
 
-  const scale = scaleQuantile()
-    .domain(arcs.map((a) => Math.abs(a.value)))
-    .range(inFlowColors.map((_, i) => i));
+  let arcs: MigrationFlow[] = [];
 
-  arcs.forEach((a) => {
-    a.quantile = scale(Math.abs(a.value));
-  });
+  if (!selectedMunicipio) {
+    // TODOS los arcos por default
+    data.forEach((source) => {
+      Object.entries(source.properties.flujos).forEach(([toId, anidacion]) => {
+        const target = featuresById[toId];
+        if (!target) return;
+        arcs.push({
+          source,
+          target,
+          value: anios.reduce(
+            (acc, a) =>
+              acc +
+              (Object.keys(anidacion).includes(a)
+                ? anidacion[a][grupoEtario]
+                : 0),
+            0,
+          ),
+          quantile: 0,
+        });
+      });
+    });
+  } else {
+    // Solo arcos del municipio seleccionado
+    Object.entries(selectedMunicipio.properties.flujos).forEach(
+      ([toId, value]) => {
+        const target = featuresById[toId];
+        if (!target) return;
+        arcs.push({ source: selectedMunicipio!, target, value, quantile: 0 });
+      },
+    );
+  }
 
   return arcs;
 }
 
-function getTooltip({ object }: PickingInfo<County>) {
-  return object && object.properties.name;
+// Tooltip simple
+function getTooltip({ object }: PickingInfo<Municipio>) {
+  return object && `${object.properties.NOMGEO}, ${object.properties.CVE_ENT}`;
 }
 
 export default function App() {
-  const [data, setData] = useState<County[] | undefined>();
-  const [selectedCounty, selectCounty] = useState<County>();
+  const [data, setData] = useState<Municipio[]>();
+  const [hoveredMunicipio, setHoveredMunicipio] = useState<Municipio | null>(
+    null,
+  );
 
+  // Cargar GeoJSON
   useEffect(() => {
-    // Carga de GeoJSON usando loaders.gl
-    load(DATA_URL, JSONLoader)
-      .then((json) => {
-        console.log("GeoJSON cargado:", json);
-        setData(json.features); // setea solo features
-      })
-      .catch((err) => console.error("Error cargando GeoJSON:", err));
+    fetch(DATA_URL)
+      .then((resp) => resp.json())
+      .then((json) => setData(json.features));
   }, []);
 
   const arcs = useMemo(
-    () => calculateArcs(data, selectedCounty),
-    [data, selectedCounty]
+    () => calculateArcs(data, hoveredMunicipio),
+    [data, hoveredMunicipio],
   );
+  const widthScale = useMemo(() => {
+    if (!arcs || arcs.length === 0) return () => 1;
+    const values = arcs.map((a) => Math.abs(a.value));
+    return scaleLinear()
+      .domain([Math.min(...values), Math.max(...values)])
+      .range([1, 8]); // min 1px, max 10px
+  }, [arcs]);
 
-  const layers = useMemo(() => {
-    if (!data) return [];
-    return [
-      new GeoJsonLayer<CountyProperties>({
-        id: "geojson",
-        data,
-        stroked: false,
-        filled: true,
-        getFillColor: [0, 0, 0, 0],
-        pickable: true,
-        onClick: ({ object }) => selectCounty(object),
-      }),
-      new ArcLayer<MigrationFlow>({
-        id: "arc",
-        data: arcs,
-        getSourcePosition: (d) => d.source.properties.centroid,
-        getTargetPosition: (d) => d.target.properties.centroid,
-        getSourceColor: (d) =>
-          (d.value > 0 ? inFlowColors : outFlowColors)[d.quantile],
-        getTargetColor: (d) =>
-          (d.value > 0 ? outFlowColors : inFlowColors)[d.quantile],
-        getWidth: 1,
-      }),
-    ];
-  }, [data, arcs]);
+  const layers = [
+    new GeoJsonLayer<MunicipioProperties>({
+      id: "geojson",
+      data,
+      stroked: true,
+      filled: true,
+      getFillColor: [200, 200, 200, 240],
+      pickable: true,
+      onHover: ({ object }) => setHoveredMunicipio(object || null),
+      onClick: ({ object }) => setHoveredMunicipio(object || null),
+    }),
+    new ArcLayer<MigrationFlow>({
+      id: "arc",
+      data: arcs,
+      getSourcePosition: (d) => d.source.properties.centroid,
+      getTargetPosition: (d) => d.target.properties.centroid,
+      getSourceColor: [100, 70, 250, 200],
+      getTargetColor: [250, 30, 50, 200],
+      getWidth: (d) => widthScale(Math.abs(d.value)),
+      getHeight: 0.7,
+    }),
+  ];
 
   return (
     <DeckGL
       layers={layers}
       initialViewState={INITIAL_VIEW_STATE}
-      controller
+      controller={true}
       getTooltip={getTooltip}
     >
       <Map reuseMaps mapStyle={MAP_STYLE} />
