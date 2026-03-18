@@ -58,9 +58,17 @@ function calculateArcs(
   if (!selectedMunicipio) {
     // TODOS los arcos por default
     data.forEach((source) => {
+      if (typeof source.properties.flujos === "string") {
+        console.log(source.properties.flujos.replace(/&quot;/gi, '"'));
+        source.properties.flujos = JSON.parse(
+          source.properties.flujos?.replace(/&quot;/gi, '"'),
+        );
+      }
+
       Object.entries(source.properties.flujos).forEach(([toId, anidacion]) => {
         const target = featuresById[toId];
         if (!target) return;
+
         arcs.push({
           source,
           target,
@@ -79,10 +87,22 @@ function calculateArcs(
   } else {
     // Solo arcos del municipio seleccionado
     Object.entries(selectedMunicipio.properties.flujos).forEach(
-      ([toId, value]) => {
+      ([toId, anidacion]) => {
         const target = featuresById[toId];
         if (!target) return;
-        arcs.push({ source: selectedMunicipio!, target, value, quantile: 0 });
+        arcs.push({
+          source: selectedMunicipio!,
+          target,
+          value: anios.reduce(
+            (acc, a) =>
+              acc +
+              (Object.keys(anidacion).includes(a)
+                ? anidacion[a][grupoEtario]
+                : 0),
+            0,
+          ),
+          quantile: 0,
+        });
       },
     );
   }
