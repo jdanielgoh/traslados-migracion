@@ -5,9 +5,73 @@ import { DeckGL } from "@deck.gl/react";
 import { GeoJsonLayer, ArcLayer } from "@deck.gl/layers";
 import { scaleLinear } from "d3-scale";
 
-import type { Color, PickingInfo, MapViewState } from "@deck.gl/core";
+import type { PickingInfo, MapViewState } from "@deck.gl/core";
 import type { Feature, Polygon, MultiPolygon } from "geojson";
+import correspondecia_o_d from "./assets/correspondencias_origen_destino.json";
+import sentido_o_d from "./assets/sentidos_origen_destino.json";
+import {
+  Paper,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormLabel,
+  FormControl,
+  IconButton,
+  Collapse,
+  Box,
+  Typography,
+  Slider,
+} from "@mui/material";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
+function valuetext(value: number) {
+  return `año ${value}`;
+}
+const minDistance = 0;
 
+const dict_color_correspondencia = {
+  "Dispersion sobre una ruta": [35, 225, 175],
+  "Dispersion entre rutas": [252, 219, 83],
+  "Dispersión fuera de las rutas": [236, 44, 230],
+};
+const dict_color_sentido = {
+  Retorno: [255, 52, 109],
+  Avance: [43, 186, 245],
+  Otro: [200, 200, 200],
+};
+function rgbToHex([r, g, b]: number[]) {
+  return `rgb(${r},${g},${b})`;
+}
+function Nomenclatura({ tipo }: { tipo: string }) {
+  const dict =
+    tipo === "sentido" ? dict_color_sentido : dict_color_correspondencia;
+
+  return (
+    <Box sx={{ mt: 0 }}>
+      <FormLabel sx={{ fontSize: 12 }}>Nomenclatura</FormLabel>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, mt: 0.5 }}>
+        {Object.entries(dict).map(([label, color]) => (
+          <Box
+            key={label}
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          >
+            <Box
+              sx={{
+                width: 14,
+                height: 14,
+                borderRadius: "3px",
+                flexShrink: 0,
+                backgroundColor: rgbToHex(color),
+              }}
+            />
+            <Typography variant="caption" sx={{ lineHeight: 1 }}>
+              {label}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  );
+}
 const DATA_URL =
   "https://raw.githubusercontent.com/jdanielgoh/traslados-migracion/refs/heads/main/public/flujos-origen-destino_desagregado.json";
 
@@ -16,13 +80,11 @@ const INITIAL_VIEW_STATE: MapViewState = {
   latitude: 23,
   zoom: 5,
   maxZoom: 15,
-  pitch: 100,
+  pitch: 0,
   bearing: 0,
 };
-const grupoEtario = "total_infancias";
-const anios = ["2018", "2019", "2020", "2021"];
 const MAP_STYLE =
-  "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
+  "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
 
 type MunicipioProperties = {
   NOMGEO: string;
@@ -42,85 +104,114 @@ type MigrationFlow = {
 };
 
 // Calcula arcos
-function calculateArcs(
-  data: Municipio[] | undefined,
-  selectedMunicipio?: Municipio | null,
-) {
-  if (!data || !data.length) return [];
-
-  // Diccionario cve_mun -> municipio
-  const featuresById: Record<string, Municipio> = Object.fromEntries(
-    data.map((f) => [f.properties.cve_mun, f]),
-  );
-
-  let arcs: MigrationFlow[] = [];
-
-  if (!selectedMunicipio) {
-    // TODOS los arcos por default
-    data.forEach((source) => {
-      if (typeof source.properties.flujos === "string") {
-        console.log(source.properties.flujos.replace(/&quot;/gi, '"'));
-        source.properties.flujos = JSON.parse(
-          source.properties.flujos?.replace(/&quot;/gi, '"'),
-        );
-      }
-
-      Object.entries(source.properties.flujos).forEach(([toId, anidacion]) => {
-        const target = featuresById[toId];
-        if (!target) return;
-
-        arcs.push({
-          source,
-          target,
-          value: anios.reduce(
-            (acc, a) =>
-              acc +
-              (Object.keys(anidacion).includes(a)
-                ? anidacion[a][grupoEtario]
-                : 0),
-            0,
-          ),
-          quantile: 0,
-        });
-      });
-    });
-  } else {
-    // Solo arcos del municipio seleccionado
-    Object.entries(selectedMunicipio.properties.flujos).forEach(
-      ([toId, anidacion]) => {
-        const target = featuresById[toId];
-        if (!target) return;
-        arcs.push({
-          source: selectedMunicipio!,
-          target,
-          value: anios.reduce(
-            (acc, a) =>
-              acc +
-              (Object.keys(anidacion).includes(a)
-                ? anidacion[a][grupoEtario]
-                : 0),
-            0,
-          ),
-          quantile: 0,
-        });
-      },
-    );
-  }
-
-  return arcs;
-}
-
-// Tooltip simple
-function getTooltip({ object }: PickingInfo<Municipio>) {
-  return object && `${object.properties.NOMGEO}, ${object.properties.CVE_ENT}`;
-}
 
 export default function App() {
+  const [open, setOpen] = useState(true);
+  const [grupoEtario, cambiaGrupoEtario] = useState("total");
+
+  const [tipo_traslado, setTipoTraslado] = useState("sentido");
   const [data, setData] = useState<Municipio[]>();
   const [hoveredMunicipio, setHoveredMunicipio] = useState<Municipio | null>(
     null,
   );
+  const [anios, setAnios] = React.useState<number[]>([2017, 2024]);
+  function calculateArcs(
+    data: Municipio[] | undefined,
+    selectedMunicipio?: Municipio | null,
+  ) {
+    if (!data || !data.length) return [];
 
+    // Diccionario clave -> municipio
+    const featuresById: Record<string, Municipio> = Object.fromEntries(
+      data.map((f) => [f.id, f]),
+    );
+
+    let arcs: MigrationFlow[] = [];
+    let lista_anios = Array.from(
+      { length: anios[1] - anios[0] + 1 },
+      (_, i) => "" + (anios[0] + i),
+    );
+    if (!selectedMunicipio) {
+      // TODOS los arcos por default
+
+      data.forEach((source) => {
+        source.properties.valor = 0;
+        Object.entries(source.properties.flujos).forEach(
+          ([toId, anidacion]) => {
+            const target = featuresById[toId];
+            if (!target) return;
+            let valor = lista_anios.reduce(
+              (acc, a) =>
+                acc +
+                (Object.keys(anidacion).includes(a)
+                  ? anidacion[a][grupoEtario]
+                  : 0),
+              0,
+            );
+            if (valor > 0) {
+              arcs.push({
+                source,
+                target,
+                value: valor,
+                quantile: 0,
+              });
+            }
+
+            source.properties.valor += valor;
+          },
+        );
+      });
+    } else {
+      // Solo arcos del municipio seleccionado
+      Object.entries(selectedMunicipio.properties.flujos).forEach(
+        ([toId, anidacion]) => {
+          const target = featuresById[toId];
+          if (!target) return;
+          let valor = lista_anios.reduce(
+            (acc, a) =>
+              acc +
+              (Object.keys(anidacion).includes(a)
+                ? anidacion[a][grupoEtario]
+                : 0),
+            0,
+          );
+          if (valor > 0) {
+            arcs.push({
+              source: selectedMunicipio!,
+              target,
+              value: valor,
+              quantile: 0,
+            });
+          }
+        },
+      );
+    }
+
+    return arcs;
+  }
+
+  // Tooltip simple
+  function getTooltip({ object }: PickingInfo<Municipio>) {
+    console.log(object);
+    return object && `${object.properties.NOMGEO}, ${object.properties.valor}`;
+  }
+  const handleChange2 = (
+    event: Event,
+    newValue: number[],
+    activeThumb: number,
+  ) => {
+    if (newValue[1] - newValue[0] < minDistance) {
+      if (activeThumb === 0) {
+        const clamped = Math.min(newValue[0], 1 - minDistance);
+        setAnios([clamped, clamped + minDistance]);
+      } else {
+        const clamped = Math.max(newValue[1], minDistance);
+        setAnios([clamped - minDistance, clamped]);
+      }
+    } else {
+      setAnios(newValue);
+    }
+  };
   // Cargar GeoJSON
   useEffect(() => {
     fetch(DATA_URL)
@@ -130,14 +221,17 @@ export default function App() {
 
   const arcs = useMemo(
     () => calculateArcs(data, hoveredMunicipio),
-    [data, hoveredMunicipio],
+    [data, hoveredMunicipio, anios, grupoEtario],
   );
   const widthScale = useMemo(() => {
     if (!arcs || arcs.length === 0) return () => 1;
     const values = arcs.map((a) => Math.abs(a.value));
     return scaleLinear()
       .domain([Math.min(...values), Math.max(...values)])
-      .range([1, 8]); // min 1px, max 10px
+      .range([
+        0.5 + 0.006 * Math.min(...values),
+        0.5 + 0.006 * Math.max(...values),
+      ]); // min 1px, max 10px
   }, [arcs]);
 
   const layers = [
@@ -151,27 +245,148 @@ export default function App() {
       onHover: ({ object }) => setHoveredMunicipio(object || null),
       onClick: ({ object }) => setHoveredMunicipio(object || null),
     }),
+
     new ArcLayer<MigrationFlow>({
       id: "arc",
       data: arcs,
-      getSourcePosition: (d) => d.source.properties.centroid,
+      getSourcePosition: (d) => {
+        return d.source.properties.centroid;
+      },
       getTargetPosition: (d) => d.target.properties.centroid,
-      getSourceColor: [100, 70, 250, 200],
-      getTargetColor: [250, 30, 50, 200],
+      getSourceColor: (d) => [
+        ...(tipo_traslado == "sentido"
+          ? dict_color_sentido[sentido_o_d[d.source.id + d.target.id]]
+          : dict_color_correspondencia[
+              correspondecia_o_d[d.source.id + d.target.id]
+            ]),
+        50,
+      ],
+      getTargetColor: (d) => [
+        ...(tipo_traslado == "sentido"
+          ? dict_color_sentido[sentido_o_d[d.source.id + d.target.id]]
+          : dict_color_correspondencia[
+              correspondecia_o_d[d.source.id + d.target.id]
+            ]),
+        200,
+      ],
       getWidth: (d) => widthScale(Math.abs(d.value)),
-      getHeight: 0.7,
+      getHeight: () => 0.5 + Math.random() * 0.001,
+      updateTriggers: {
+        getSourceColor: [tipo_traslado],
+        getTargetColor: [tipo_traslado],
+      },
     }),
   ];
+  const cambioTipoTraslado = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTipoTraslado(event.target.value);
+  };
+  const cambioPoblacion = (event: React.ChangeEvent<HTMLInputElement>) => {
+    cambiaGrupoEtario(event.target.value);
+  };
 
   return (
-    <DeckGL
-      layers={layers}
-      initialViewState={INITIAL_VIEW_STATE}
-      controller={true}
-      getTooltip={getTooltip}
-    >
-      <Map reuseMaps mapStyle={MAP_STYLE} />
-    </DeckGL>
+    <>
+      <Paper
+        elevation={3}
+        sx={{
+          position: "absolute",
+          top: 16,
+          left: 16,
+          p: 1,
+          borderRadius: 2,
+          zIndex: 1,
+          backgroundColor: "rgba(255,255,255,0.9)",
+          minWidth: 200,
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <strong>Controles</strong>
+          <IconButton size="small" onClick={() => setOpen(!open)}>
+            {open ? <ExpandLess /> : <ExpandMore />}
+          </IconButton>
+        </Box>
+
+        <Collapse in={open} timeout="auto" unmountOnExit>
+          <FormControl>
+            <FormLabel id="demo-radio-buttons-group-label">
+              Tipo de traslado
+            </FormLabel>
+            <RadioGroup
+              aria-labelledby="demo-radio-buttons-group-label"
+              defaultValue="sentido"
+              name="radio-buttons-group"
+            >
+              <FormControlLabel
+                value="sentido"
+                control={<Radio />}
+                label="Sentido"
+                onChange={cambioTipoTraslado}
+              />
+              <Nomenclatura tipo={"sentido"} />
+
+              <FormControlLabel
+                value="correspondencia"
+                control={<Radio />}
+                label="Correspondencia"
+                onChange={cambioTipoTraslado}
+              />
+              <Nomenclatura tipo={"correspondencia"} />
+            </RadioGroup>
+          </FormControl>
+          <Typography gutterBottom sx={{ lineHeight: 1, mt: 2 }}>
+            Elige un rango temporal
+          </Typography>
+          <Slider
+            getAriaLabel={() => "Minimum distance shift"}
+            value={anios}
+            onChange={handleChange2}
+            valueLabelDisplay="auto"
+            getAriaValueText={valuetext}
+            disableSwap
+            min={2017}
+            max={2024}
+            step={1}
+            sx={{ display: "flex", alignItems: "center" }}
+          />
+          <FormControl>
+            <FormLabel id="demo-radio-buttons-group-label">Población</FormLabel>
+            <RadioGroup
+              aria-labelledby="demo-radio-buttons-group-label"
+              defaultValue="total"
+              name="radio-buttons-group"
+            >
+              <FormControlLabel
+                value="total"
+                control={<Radio />}
+                label="Total"
+                onChange={cambioPoblacion}
+              />
+
+              <FormControlLabel
+                value="total_infancias"
+                control={<Radio />}
+                label="Menor de edad"
+                onChange={cambioPoblacion}
+              />
+            </RadioGroup>
+          </FormControl>
+        </Collapse>
+      </Paper>
+      <DeckGL
+        layers={layers}
+        initialViewState={INITIAL_VIEW_STATE}
+        controller={true}
+        getTooltip={getTooltip}
+      >
+        <Map reuseMaps mapStyle={MAP_STYLE} />
+      </DeckGL>
+    </>
   );
 }
 

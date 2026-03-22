@@ -17,6 +17,7 @@
     "@loaders.gl/gltf": "^4.3.4",
     "@loaders.gl/json": "^4.3.4",
     "@mui/material": "^7.3.0",
+    "@mui/icons-material": "^7.3.4",
     "d3": "^7.9.0",
     "deck.gl": "^9.1.13",
     "mapbox-gl": "^3.14.0",
