@@ -6,7 +6,13 @@ import { GeoJsonLayer, ArcLayer } from "@deck.gl/layers";
 import { scaleLinear } from "d3-scale";
 
 import type { PickingInfo, MapViewState } from "@deck.gl/core";
-import type { Feature, Polygon, MultiPolygon } from "geojson";
+import type {
+  Feature,
+  Polygon,
+  MultiPolygon,
+  MultiLineString,
+  LineString,
+} from "geojson";
 import correspondecia_o_d from "./assets/correspondencias_origen_destino.json";
 import sentido_o_d from "./assets/sentidos_origen_destino.json";
 import {
@@ -72,8 +78,14 @@ function Nomenclatura({ tipo }: { tipo: string }) {
     </Box>
   );
 }
+type RoadProperties = {
+  NOMGEO: string;
+};
+
 const DATA_URL =
   "https://raw.githubusercontent.com/jdanielgoh/traslados-migracion/refs/heads/main/public/flujos-origen-destino_desagregado.json";
+const RUTAS_URL =
+  "https://raw.githubusercontent.com/jdanielgoh/traslados-migracion/refs/heads/main/public/rutas_migratorias.json";
 
 const INITIAL_VIEW_STATE: MapViewState = {
   longitude: -102,
@@ -95,6 +107,7 @@ type MunicipioProperties = {
 };
 
 type Municipio = Feature<Polygon | MultiPolygon, MunicipioProperties>;
+type Ruta = Feature<LineString | MultiLineString, RoadProperties>;
 
 type MigrationFlow = {
   source: Municipio;
@@ -111,6 +124,8 @@ export default function App() {
 
   const [tipo_traslado, setTipoTraslado] = useState("sentido");
   const [data, setData] = useState<Municipio[]>();
+  const [rutas, setRutas] = useState<Ruta[]>();
+
   const [hoveredMunicipio, setHoveredMunicipio] = useState<Municipio | null>(
     null,
   );
@@ -218,6 +233,11 @@ export default function App() {
       .then((resp) => resp.json())
       .then((json) => setData(json.features));
   }, []);
+  useEffect(() => {
+    fetch(RUTAS_URL)
+      .then((resp) => resp.json())
+      .then((json) => setRutas(json.features));
+  }, []);
 
   const arcs = useMemo(
     () => calculateArcs(data, hoveredMunicipio),
@@ -244,6 +264,15 @@ export default function App() {
       pickable: true,
       onHover: ({ object }) => setHoveredMunicipio(object || null),
       onClick: ({ object }) => setHoveredMunicipio(object || null),
+    }),
+    new GeoJsonLayer({
+      id: "rutas",
+      data: rutas,
+      stroked: true,
+      filled: false,
+      getLineColor: [255, 100, 0],
+      getLineWidth: 2,
+      lineWidthUnits: "pixels",
     }),
 
     new ArcLayer<MigrationFlow>({
