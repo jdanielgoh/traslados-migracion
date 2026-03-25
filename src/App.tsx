@@ -102,6 +102,7 @@ const MAP_STYLE =
 type MunicipioProperties = {
   NOMGEO: string;
   CVE_ENT: string;
+  NOM_ENT: string;
   cve_mun: string;
   flujos: Record<string, number>;
   centroid: [number, number];
@@ -214,7 +215,9 @@ export default function App() {
       object && {
         html:
           object &&
-          `${object.properties.NOMGEO}</br> <b>${object.properties.valor}</b>`,
+          `${object.properties.NOMGEO}, ${object.properties.NOM_ENT}</br> 
+          
+          ${grupoEtario == "total" ? "Traslados totales" : "Traslados de menores de edad"}: <b>${object.properties.valor.toLocaleString("en")}</b>`,
         style: {
           backgroundColor: "rgba(0,0,0,0.8)",
           color: "white",
