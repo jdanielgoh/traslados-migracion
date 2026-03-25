@@ -210,8 +210,20 @@ export default function App() {
 
   // Tooltip simple
   function getTooltip({ object }: PickingInfo<Municipio>) {
-    console.log(object);
-    return object && `${object.properties.NOMGEO}, ${object.properties.valor}`;
+    return (
+      object && {
+        html:
+          object &&
+          `${object.properties.NOMGEO}</br> <b>${object.properties.valor}</b>`,
+        style: {
+          backgroundColor: "rgba(0,0,0,0.8)",
+          color: "white",
+          fontSize: "12px",
+          borderRadius: "4px",
+          padding: "6px 10px",
+        },
+      }
+    );
   }
   const handleChange2 = (
     event: Event,
