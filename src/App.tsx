@@ -24,6 +24,7 @@ import {
   FormControl,
   IconButton,
   Collapse,
+  Checkbox,
   Box,
   Typography,
   Slider,
@@ -119,6 +120,8 @@ type MigrationFlow = {
 // Calcula arcos
 
 export default function App() {
+  const [mostrarRutas, setMostrarRutas] = useState(true);
+
   const [open, setOpen] = useState(true);
   const [grupoEtario, cambiaGrupoEtario] = useState("total");
 
@@ -265,15 +268,16 @@ export default function App() {
       onHover: ({ object }) => setHoveredMunicipio(object || null),
       onClick: ({ object }) => setHoveredMunicipio(object || null),
     }),
-    new GeoJsonLayer({
-      id: "rutas",
-      data: rutas,
-      stroked: true,
-      filled: false,
-      getLineColor: [255, 100, 0],
-      getLineWidth: 2,
-      lineWidthUnits: "pixels",
-    }),
+    mostrarRutas &&
+      new GeoJsonLayer({
+        id: "rutas",
+        data: rutas,
+        stroked: true,
+        filled: false,
+        getLineColor: [255, 100, 0],
+        getLineWidth: 2,
+        lineWidthUnits: "pixels",
+      }),
 
     new ArcLayer<MigrationFlow>({
       id: "arc",
@@ -305,7 +309,7 @@ export default function App() {
         getTargetColor: [tipo_traslado],
       },
     }),
-  ];
+  ].filter(Boolean);
   const cambioTipoTraslado = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTipoTraslado(event.target.value);
   };
@@ -343,6 +347,22 @@ export default function App() {
 
         <Collapse in={open} timeout="auto" unmountOnExit>
           <FormControl>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={mostrarRutas}
+                  onChange={(e) => setMostrarRutas(e.target.checked)}
+                  size="small"
+                  sx={{
+                    color: "rgb(255, 100, 0)",
+                    "&.Mui-checked": {
+                      color: "rgb(255, 100, 0)",
+                    },
+                  }}
+                />
+              }
+              label="Rutas"
+            />
             <FormLabel id="demo-radio-buttons-group-label">
               Tipo de traslado
             </FormLabel>
