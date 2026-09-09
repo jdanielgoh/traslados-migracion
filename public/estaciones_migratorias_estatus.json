@@ -1,1 +1,284 @@
-[{"cve_mun":"01001","em":1,"nom_mun":"Aguascalientes","repeticiones":1},{"cve_mun":"02004","em":1,"nom_mun":"Tijuana","repeticiones":1},{"cve_mun":"04009","em":1,"nom_mun":"Esc\u00e1rcega","repeticiones":1},{"cve_mun":"04002","em":0,"nom_mun":"Campeche","repeticiones":1},{"cve_mun":"07019","em":1,"nom_mun":"Comit\u00e1n de Dom\u00ednguez","repeticiones":1},{"cve_mun":"07101","em":1,"nom_mun":"Tuxtla Guti\u00e9rrez","repeticiones":1},{"cve_mun":"08035","em":1,"nom_mun":"Janos","repeticiones":1},{"cve_mun":"08019","em":1,"nom_mun":"Chihuahua","repeticiones":1},{"cve_mun":"09015","em":1,"nom_mun":"Ciudad de M\u00e9xico","repeticiones":1},{"cve_mun":"05025","em":1,"nom_mun":"Piedras Negras","repeticiones":1},{"cve_mun":"13048","em":1,"nom_mun":"Pachuca de Soto","repeticiones":1},{"cve_mun":"14039","em":1,"nom_mun":"Guadalajara","repeticiones":1},{"cve_mun":"20413","em":1,"nom_mun":"Santa Mar\u00eda Huatulco","repeticiones":1},{"cve_mun":"22014","em":1,"nom_mun":"Quer\u00e9taro","repeticiones":1},{"cve_mun":"23004","em":1,"nom_mun":"Oth\u00f3n P. Blanco","repeticiones":1},{"cve_mun":"24028","em":1,"nom_mun":"San Luis Potos\u00ed","repeticiones":1},{"cve_mun":"25012","em":1,"nom_mun":"Mazatl\u00e1n","repeticiones":1},{"cve_mun":"27017","em":0,"nom_mun":"Tenosique","repeticiones":1},{"cve_mun":"28027","em":1,"nom_mun":"Nuevo Laredo","repeticiones":1},{"cve_mun":"29033","em":1,"nom_mun":"Tlaxcala","repeticiones":1},{"cve_mun":"30003","em":1,"nom_mun":"Acayucan","repeticiones":1},{"cve_mun":"31050","em":1,"nom_mun":"M\u00e9rida","repeticiones":1},{"cve_mun":"15106","em":0,"nom_mun":"Toluca","repeticiones":1},{"cve_mun":"20327","em":0,"nom_mun":"San Pedro Tapanatepec","repeticiones":1},{"cve_mun":"20079","em":0,"nom_mun":"Salina Cruz","repeticiones":1},{"cve_mun":"28041","em":0,"nom_mun":"Victoria","repeticiones":1},{"cve_mun":"04003","em":1,"nom_mun":"Carmen","repeticiones":1},{"cve_mun":"16053","em":1,"nom_mun":"Morelia","repeticiones":1},{"cve_mun":"18017","em":0,"nom_mun":"Tepic","repeticiones":1},{"cve_mun":"08017","em":0,"nom_mun":"Cuauht\u00e9moc","repeticiones":1},{"cve_mun":"07078","em":1,"nom_mun":"San Crist\u00f3bal de las Casas","repeticiones":1},{"cve_mun":"05030","em":1,"nom_mun":"Saltillo","repeticiones":1},{"cve_mun":"05035","em":1,"nom_mun":"Torre\u00f3n","repeticiones":1},{"cve_mun":"05018","em":1,"nom_mun":"Monclova","repeticiones":1},{"cve_mun":"11003","em":0,"nom_mun":"San Miguel de Allende","repeticiones":1},{"cve_mun":"12001","em":1,"nom_mun":"Acapulco de Ju\u00e1rez","repeticiones":1},{"cve_mun":"15095","em":0,"nom_mun":"Tepotzotl\u00e1n","repeticiones":1},{"cve_mun":"20014","em":0,"nom_mun":"Ciudad Ixtepec","repeticiones":1},{"cve_mun":"21114","em":1,"nom_mun":"Puebla","repeticiones":1},{"cve_mun":"23005","em":1,"nom_mun":"Benito Ju\u00e1rez","repeticiones":1},{"cve_mun":"28022","em":1,"nom_mun":"Matamoros","repeticiones":1},{"cve_mun":"07089","em":1,"nom_mun":"Tapachula","repeticiones":1},{"cve_mun":"07087","em":0,"nom_mun":"Suchiate","repeticiones":1},{"cve_mun":"07009","em":0,"nom_mun":"Arriaga","repeticiones":1},{"cve_mun":"15025","em":0,"nom_mun":"Chalco","repeticiones":1},{"cve_mun":"15039","em":0,"nom_mun":"Ixtapaluca","repeticiones":1},{"cve_mun":"15104","em":0,"nom_mun":"Tlalnepantla de Baz","repeticiones":1},{"cve_mun":"19039","em":0,"nom_mun":"Monterrey","repeticiones":1},{"cve_mun":"26030","em":1,"nom_mun":"Hermosillo","repeticiones":1},{"cve_mun":"15057","em":0,"nom_mun":"Naucalpan de Ju\u00e1rez","repeticiones":1},{"cve_mun":"07037","em":1,"nom_mun":"Huehuet\u00e1n","repeticiones":1},{"cve_mun":"07040","em":1,"nom_mun":"Huixtla","repeticiones":1},{"cve_mun":"07099","em":0,"nom_mun":"La Trinitaria","repeticiones":1},{"cve_mun":"08037","em":0,"nom_mun":"Ju\u00e1rez","repeticiones":1},{"cve_mun":"05002","em":0,"nom_mun":"Acu\u00f1a","repeticiones":1},{"cve_mun":"11020","em":0,"nom_mun":"Le\u00f3n","repeticiones":1},{"cve_mun":"11007","em":0,"nom_mun":"Celaya","repeticiones":1},{"cve_mun":"11027","em":0,"nom_mun":"Salamanca","repeticiones":1},{"cve_mun":"11015","em":0,"nom_mun":"Guanajuato","repeticiones":1},{"cve_mun":"15014","em":0,"nom_mun":"Atlacomulco","repeticiones":1},{"cve_mun":"15035","em":0,"nom_mun":"Huehuetoca","repeticiones":1},{"cve_mun":"20083","em":0,"nom_mun":"San Agust\u00edn de las Juntas","repeticiones":1},{"cve_mun":"20418","em":0,"nom_mun":"Santa Mar\u00eda Jalapa del Marqu\u00e9s","repeticiones":1},{"cve_mun":"07065","em":1,"nom_mun":"Palenque","repeticiones":1},{"cve_mun":"25009","em":0,"nom_mun":"Escuinapa","repeticiones":1},{"cve_mun":"25011","em":0,"nom_mun":"Guasave","repeticiones":1},{"cve_mun":"25001","em":0,"nom_mun":"Ahome","repeticiones":1},{"cve_mun":"07027","em":0,"nom_mun":"Chiapa de Corzo","repeticiones":1},{"cve_mun":"08011","em":0,"nom_mun":"Camargo","repeticiones":1},{"cve_mun":"07069","em":1,"nom_mun":"Pijijiapan","repeticiones":1},{"cve_mun":"07102","em":0,"nom_mun":"Tuxtla Chico","repeticiones":1},{"cve_mun":"05027","em":0,"nom_mun":"Ramos Arizpe","repeticiones":1},{"cve_mun":"05013","em":0,"nom_mun":"Hidalgo","repeticiones":1},{"cve_mun":"16052","em":0,"nom_mun":"L\u00e1zaro C\u00e1rdenas","repeticiones":1},{"cve_mun":"07012","em":0,"nom_mun":"Berrioz\u00e1bal","repeticiones":1},{"cve_mun":"07097","em":0,"nom_mun":"Tonal\u00e1","repeticiones":1},{"cve_mun":"30108","em":0,"nom_mun":"Minatitl\u00e1n","repeticiones":1},{"cve_mun":"30039","em":0,"nom_mun":"Coatzacoalcos","repeticiones":1},{"cve_mun":"27008","em":0,"nom_mun":"Huimanguillo","repeticiones":1},{"cve_mun":"25006","em":0,"nom_mun":"Culiac\u00e1n","repeticiones":1},{"cve_mun":"32017","em":0,"nom_mun":"Guadalupe","repeticiones":1},{"cve_mun":"20067","em":1,"nom_mun":"Oaxaca de Ju\u00e1rez","repeticiones":2},{"cve_mun":"20043","em":1,"nom_mun":"Heroica Ciudad de Juchit\u00e1n de Zaragoza","repeticiones":2},{"cve_mun":"27004","em":1,"nom_mun":"Centro","repeticiones":2},{"cve_mun":"28032","em":1,"nom_mun":"Reynosa","repeticiones":2},{"cve_mun":"28038","em":1,"nom_mun":"Tampico","repeticiones":2},{"cve_mun":"32056","em":1,"nom_mun":"Zacatecas","repeticiones":2},{"cve_mun":"10007","em":1,"nom_mun":"G\u00f3mez Palacio","repeticiones":2},{"cve_mun":"19026","em":1,"nom_mun":"Guadalupe","repeticiones":2},{"cve_mun":"30193","em":1,"nom_mun":"Veracruz","repeticiones":2}]
+[
+  { "cve_mun": "08035", "em": 1, "nom_mun": "Janos", "repeticiones": 1 },
+  {
+    "cve_mun": "13048",
+    "em": 1,
+    "nom_mun": "Pachuca de Soto",
+    "repeticiones": 1
+  },
+  { "cve_mun": "14039", "em": 1, "nom_mun": "Guadalajara", "repeticiones": 1 },
+  { "cve_mun": "15106", "em": 0, "nom_mun": "Toluca", "repeticiones": 1 },
+  {
+    "cve_mun": "20327",
+    "em": 0,
+    "nom_mun": "San Pedro Tapanatepec",
+    "repeticiones": 1
+  },
+  {
+    "cve_mun": "23004",
+    "em": 1,
+    "nom_mun": "Oth\u00f3n P. Blanco",
+    "repeticiones": 1
+  },
+  {
+    "cve_mun": "24028",
+    "em": 1,
+    "nom_mun": "San Luis Potos\u00ed",
+    "repeticiones": 1
+  },
+  { "cve_mun": "28027", "em": 1, "nom_mun": "Nuevo Laredo", "repeticiones": 1 },
+  {
+    "cve_mun": "01005",
+    "em": 0,
+    "nom_mun": "Jes\u00fas Mar\u00eda",
+    "repeticiones": 1
+  },
+  { "cve_mun": "02004", "em": 1, "nom_mun": "Tijuana", "repeticiones": 1 },
+  {
+    "cve_mun": "04009",
+    "em": 1,
+    "nom_mun": "Esc\u00e1rcega",
+    "repeticiones": 1
+  },
+  { "cve_mun": "04002", "em": 0, "nom_mun": "Campeche", "repeticiones": 1 },
+  {
+    "cve_mun": "07019",
+    "em": 1,
+    "nom_mun": "Comit\u00e1n de Dom\u00ednguez",
+    "repeticiones": 1
+  },
+  {
+    "cve_mun": "07101",
+    "em": 1,
+    "nom_mun": "Tuxtla Guti\u00e9rrez",
+    "repeticiones": 1
+  },
+  {
+    "cve_mun": "09015",
+    "em": 0,
+    "nom_mun": "Cuauht\u00e9moc",
+    "repeticiones": 1
+  },
+  {
+    "cve_mun": "05025",
+    "em": 1,
+    "nom_mun": "Piedras Negras",
+    "repeticiones": 1
+  },
+  {
+    "cve_mun": "20413",
+    "em": 1,
+    "nom_mun": "Santa Mar\u00eda Huatulco",
+    "repeticiones": 1
+  },
+  { "cve_mun": "20079", "em": 0, "nom_mun": "Salina Cruz", "repeticiones": 1 },
+  {
+    "cve_mun": "25012",
+    "em": 1,
+    "nom_mun": "Mazatl\u00e1n",
+    "repeticiones": 1
+  },
+  { "cve_mun": "27017", "em": 0, "nom_mun": "Tenosique", "repeticiones": 1 },
+  { "cve_mun": "28041", "em": 0, "nom_mun": "Victoria", "repeticiones": 1 },
+  {
+    "cve_mun": "29002",
+    "em": 0,
+    "nom_mun": "Apetatitl\u00e1n de Antonio Carvajal",
+    "repeticiones": 1
+  },
+  { "cve_mun": "08037", "em": 0, "nom_mun": "Ju\u00e1rez", "repeticiones": 1 },
+  { "cve_mun": "16053", "em": 1, "nom_mun": "Morelia", "repeticiones": 1 },
+  { "cve_mun": "18017", "em": 0, "nom_mun": "Tepic", "repeticiones": 1 },
+  {
+    "cve_mun": "20043",
+    "em": 1,
+    "nom_mun": "Heroica Ciudad de Juchit\u00e1n de Zaragoza",
+    "repeticiones": 1
+  },
+  { "cve_mun": "30003", "em": 1, "nom_mun": "Acayucan", "repeticiones": 1 },
+  {
+    "cve_mun": "07078",
+    "em": 1,
+    "nom_mun": "San Crist\u00f3bal de las Casas",
+    "repeticiones": 1
+  },
+  { "cve_mun": "05030", "em": 1, "nom_mun": "Saltillo", "repeticiones": 1 },
+  { "cve_mun": "05035", "em": 1, "nom_mun": "Torre\u00f3n", "repeticiones": 1 },
+  { "cve_mun": "05018", "em": 1, "nom_mun": "Monclova", "repeticiones": 1 },
+  {
+    "cve_mun": "11003",
+    "em": 0,
+    "nom_mun": "San Miguel de Allende",
+    "repeticiones": 1
+  },
+  {
+    "cve_mun": "12001",
+    "em": 1,
+    "nom_mun": "Acapulco de Ju\u00e1rez",
+    "repeticiones": 1
+  },
+  {
+    "cve_mun": "15095",
+    "em": 0,
+    "nom_mun": "Tepotzotl\u00e1n",
+    "repeticiones": 1
+  },
+  {
+    "cve_mun": "20014",
+    "em": 0,
+    "nom_mun": "Ciudad Ixtepec",
+    "repeticiones": 1
+  },
+  { "cve_mun": "21114", "em": 1, "nom_mun": "Puebla", "repeticiones": 1 },
+  {
+    "cve_mun": "23005",
+    "em": 1,
+    "nom_mun": "Benito Ju\u00e1rez",
+    "repeticiones": 1
+  },
+  { "cve_mun": "27004", "em": 1, "nom_mun": "Centro", "repeticiones": 1 },
+  { "cve_mun": "28022", "em": 1, "nom_mun": "Matamoros", "repeticiones": 1 },
+  { "cve_mun": "31050", "em": 1, "nom_mun": "M\u00e9rida", "repeticiones": 1 },
+  { "cve_mun": "07089", "em": 1, "nom_mun": "Tapachula", "repeticiones": 1 },
+  { "cve_mun": "07087", "em": 0, "nom_mun": "Suchiate", "repeticiones": 1 },
+  { "cve_mun": "07009", "em": 0, "nom_mun": "Arriaga", "repeticiones": 1 },
+  {
+    "cve_mun": "07034",
+    "em": 1,
+    "nom_mun": "Frontera Comalapa",
+    "repeticiones": 1
+  },
+  { "cve_mun": "15025", "em": 0, "nom_mun": "Chalco", "repeticiones": 1 },
+  { "cve_mun": "15039", "em": 0, "nom_mun": "Ixtapaluca", "repeticiones": 1 },
+  {
+    "cve_mun": "15104",
+    "em": 0,
+    "nom_mun": "Tlalnepantla de Baz",
+    "repeticiones": 1
+  },
+  {
+    "cve_mun": "22014",
+    "em": 1,
+    "nom_mun": "Quer\u00e9taro",
+    "repeticiones": 1
+  },
+  { "cve_mun": "26030", "em": 1, "nom_mun": "Hermosillo", "repeticiones": 1 },
+  { "cve_mun": "07069", "em": 1, "nom_mun": "Pijijiapan", "repeticiones": 1 },
+  {
+    "cve_mun": "07037",
+    "em": 1,
+    "nom_mun": "Huehuet\u00e1n",
+    "repeticiones": 1
+  },
+  { "cve_mun": "07040", "em": 1, "nom_mun": "Huixtla", "repeticiones": 1 },
+  { "cve_mun": "09007", "em": 1, "nom_mun": "Iztapalapa", "repeticiones": 1 },
+  { "cve_mun": "05002", "em": 0, "nom_mun": "Acu\u00f1a", "repeticiones": 1 },
+  { "cve_mun": "11020", "em": 0, "nom_mun": "Le\u00f3n", "repeticiones": 1 },
+  { "cve_mun": "11007", "em": 0, "nom_mun": "Celaya", "repeticiones": 1 },
+  { "cve_mun": "11027", "em": 0, "nom_mun": "Salamanca", "repeticiones": 1 },
+  { "cve_mun": "11015", "em": 0, "nom_mun": "Guanajuato", "repeticiones": 1 },
+  { "cve_mun": "15014", "em": 0, "nom_mun": "Atlacomulco", "repeticiones": 1 },
+  { "cve_mun": "15010", "em": 0, "nom_mun": "Apaxco", "repeticiones": 1 },
+  {
+    "cve_mun": "20083",
+    "em": 0,
+    "nom_mun": "San Agust\u00edn de las Juntas",
+    "repeticiones": 1
+  },
+  {
+    "cve_mun": "20418",
+    "em": 0,
+    "nom_mun": "Santa Mar\u00eda Jalapa del Marqu\u00e9s",
+    "repeticiones": 1
+  },
+  { "cve_mun": "07065", "em": 1, "nom_mun": "Palenque", "repeticiones": 1 },
+  { "cve_mun": "29033", "em": 1, "nom_mun": "Tlaxcala", "repeticiones": 1 },
+  {
+    "cve_mun": "16003",
+    "em": 0,
+    "nom_mun": "\u00c1lvaro Obreg\u00f3n",
+    "repeticiones": 1
+  },
+  { "cve_mun": "25009", "em": 0, "nom_mun": "Escuinapa", "repeticiones": 1 },
+  { "cve_mun": "25011", "em": 0, "nom_mun": "Guasave", "repeticiones": 1 },
+  { "cve_mun": "25001", "em": 0, "nom_mun": "Ahome", "repeticiones": 1 },
+  { "cve_mun": "08019", "em": 0, "nom_mun": "Chihuahua", "repeticiones": 1 },
+  { "cve_mun": "19039", "em": 0, "nom_mun": "Monterrey", "repeticiones": 1 },
+  {
+    "cve_mun": "07027",
+    "em": 0,
+    "nom_mun": "Chiapa de Corzo",
+    "repeticiones": 1
+  },
+  {
+    "cve_mun": "09017",
+    "em": 0,
+    "nom_mun": "Venustiano Carranza",
+    "repeticiones": 1
+  },
+  {
+    "cve_mun": "30108",
+    "em": 0,
+    "nom_mun": "Minatitl\u00e1n",
+    "repeticiones": 1
+  },
+  { "cve_mun": "05027", "em": 0, "nom_mun": "Ramos Arizpe", "repeticiones": 1 },
+  { "cve_mun": "19006", "em": 0, "nom_mun": "Apodaca", "repeticiones": 1 },
+  {
+    "cve_mun": "30039",
+    "em": 0,
+    "nom_mun": "Coatzacoalcos",
+    "repeticiones": 1
+  },
+  { "cve_mun": "05013", "em": 0, "nom_mun": "Hidalgo", "repeticiones": 1 },
+  { "cve_mun": "07102", "em": 0, "nom_mun": "Tuxtla Chico", "repeticiones": 1 },
+  {
+    "cve_mun": "01001",
+    "em": 1,
+    "nom_mun": "Aguascalientes",
+    "repeticiones": 1
+  },
+  { "cve_mun": "10005", "em": 0, "nom_mun": "Durango", "repeticiones": 1 },
+  {
+    "cve_mun": "16052",
+    "em": 0,
+    "nom_mun": "L\u00e1zaro C\u00e1rdenas",
+    "repeticiones": 1
+  },
+  { "cve_mun": "05022", "em": 0, "nom_mun": "Nava", "repeticiones": 1 },
+  { "cve_mun": "32017", "em": 0, "nom_mun": "Guadalupe", "repeticiones": 1 },
+  { "cve_mun": "11017", "em": 0, "nom_mun": "Irapuato", "repeticiones": 1 },
+  { "cve_mun": "07097", "em": 0, "nom_mun": "Tonal\u00e1", "repeticiones": 1 },
+  { "cve_mun": "27008", "em": 0, "nom_mun": "Huimanguillo", "repeticiones": 1 },
+  { "cve_mun": "15120", "em": 0, "nom_mun": "Zumpango", "repeticiones": 1 },
+  { "cve_mun": "30116", "em": 0, "nom_mun": "Oluta", "repeticiones": 1 },
+  {
+    "cve_mun": "07012",
+    "em": 0,
+    "nom_mun": "Berrioz\u00e1bal",
+    "repeticiones": 1
+  },
+  {
+    "cve_mun": "25006",
+    "em": 0,
+    "nom_mun": "Culiac\u00e1n",
+    "repeticiones": 1
+  },
+  {
+    "cve_mun": "20067",
+    "em": 1,
+    "nom_mun": "Oaxaca de Ju\u00e1rez",
+    "repeticiones": 2
+  },
+  {
+    "cve_mun": "10007",
+    "em": 1,
+    "nom_mun": "G\u00f3mez Palacio",
+    "repeticiones": 2
+  },
+  { "cve_mun": "28032", "em": 1, "nom_mun": "Reynosa", "repeticiones": 2 },
+  { "cve_mun": "32056", "em": 1, "nom_mun": "Zacatecas", "repeticiones": 2 },
+  { "cve_mun": "28038", "em": 1, "nom_mun": "Tampico", "repeticiones": 2 },
+  { "cve_mun": "19026", "em": 1, "nom_mun": "Guadalupe", "repeticiones": 2 },
+  { "cve_mun": "30193", "em": 1, "nom_mun": "Veracruz", "repeticiones": 2 }
+]

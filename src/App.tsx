@@ -7,17 +7,23 @@ import { scaleLinear } from "d3-scale";
 
 import type { PickingInfo } from "@deck.gl/core";
 import type { Layer } from "@deck.gl/core";
-import correspondecia_o_d from "./assets/correspondencias_origen_destino.json";
 import sentido_o_d from "./assets/sentidos_origen_destino.json";
 
-import type { Municipio, FlujoMigratorio, PropiedadesMunicipio } from "./types";
+import type {
+  Municipio,
+  Ruta,
+  FlujoMigratorio,
+  PropiedadesMunicipio,
+  PropiedadesCarretera,
+} from "./types";
 import {
   COLOR_ORIGEN,
   COLOR_DESTINO,
   COLOR_CON_ESTACION,
   COLOR_SIN_ESTACION,
-  DICT_COLOR_CORRESPONDENCIA,
-  TODAS_CORRESPONDENCIAS,
+  COLOR_NEUTRO,
+  COLOR_DETENCION,
+  COLOR_MENORES,
   ESTADO_INICIAL_MAPA,
   ESTILO_MAPA,
   DISTANCIA_MINIMA_SLIDER,
@@ -34,7 +40,7 @@ function escalaAnchoDeArcos(arcos: FlujoMigratorio[]) {
   const maxV = Math.max(...valores);
   return scaleLinear()
     .domain([minV, maxV])
-    .range([0.5 + 0.006 * minV, 0.5 + 0.006 * maxV]);
+    .range([0.5 + 0.0006 * minV, 0.5 + 0.0006 * maxV]);
 }
 
 // Calcula arcos sin mutar las propiedades de los municipios —
@@ -79,18 +85,17 @@ export default function App() {
   const [anioMaxNarrativa, setAnioMaxNarrativa] = useState(2017);
 
   // — Estado interactivo —
-  const [mostrarRutas, setMostrarRutas] = useState(true);
+  const [mostrarRutas, setMostrarRutas] = useState(false);
+  const [mostrarTodosArcos, setMostrarTodosArcos] = useState(false);
   const [panelAbierto, setPanelAbierto] = useState(true);
   const [grupoEtario, setGrupoEtario] = useState("total");
-  const [tipoTraslado, setTipoTraslado] = useState("sentido");
   const [hoveredMunicipio, setHoveredMunicipio] = useState<Municipio | null>(
     null,
   );
+  const [municipioSeleccionado, setMunicipioSeleccionado] =
+    useState<Municipio | null>(null);
   const [claveArcHover, setClaveArcHover] = useState<string | null>(null);
   const [anios, setAnios] = React.useState<number[]>([2017, 2024]);
-  const [correspondenciasActivas, setCorrespondenciasActivas] = useState<
-    Set<string>
-  >(new Set(TODAS_CORRESPONDENCIAS));
 
   // Al entrar en modo interactivo: desbloquear scroll de DeckGL
   useEffect(() => {
@@ -100,9 +105,9 @@ export default function App() {
     };
   }, [modoInteractivo]);
 
-  // Animar el rango de años en escenas 1 y 4
+  // Animar el rango de años en escena 5 (menores)
   useEffect(() => {
-    if (![1, 4].includes(escenaActiva)) {
+    if (escenaActiva !== 5) {
       setAnioMaxNarrativa(2017);
       return;
     }
@@ -115,22 +120,6 @@ export default function App() {
     }, 500);
     return () => clearInterval(intervalo);
   }, [escenaActiva]);
-
-  // Al cambiar a modo correspondencia, se restauran todos los filtros activos
-  useEffect(() => {
-    if (tipoTraslado === "correspondencia") {
-      setCorrespondenciasActivas(new Set(TODAS_CORRESPONDENCIAS));
-    }
-  }, [tipoTraslado]);
-
-  function toggleCorrespondencia(key: string) {
-    setCorrespondenciasActivas((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  }
 
   const cambioAnios = (
     _event: Event,
@@ -168,26 +157,8 @@ export default function App() {
     );
 
     if (!selectedMunicipio) {
-      data.forEach((source) => {
-        source.properties.valor = 0;
-        Object.entries(source.properties.flujos).forEach(
-          ([toId, anidacion]) => {
-            const target = municipiosPorId[toId];
-            if (!target) return;
-            const valor = listaAnios.reduce(
-              (acc, a) =>
-                acc +
-                (Object.keys(anidacion).includes(a)
-                  ? anidacion[a][grupoEtario]
-                  : 0),
-              0,
-            );
-            if (valor > 0)
-              arcos.push({ source, target, value: valor, quantile: 0 });
-            source.properties.valor += valor;
-          },
-        );
-      });
+      // Mapa en blanco por default: sin arcos hasta que el usuario seleccione un municipio
+      return [];
     } else {
       Object.entries(selectedMunicipio.properties.flujos).forEach(
         ([toId, anidacion]) => {
@@ -217,8 +188,8 @@ export default function App() {
   }
 
   const arcos = useMemo(
-    () => calcularArcos(municipios, hoveredMunicipio),
-    [municipios, hoveredMunicipio, anios, grupoEtario],
+    () => calcularArcos(municipios, hoveredMunicipio || municipioSeleccionado),
+    [municipios, hoveredMunicipio, municipioSeleccionado, anios, grupoEtario],
   );
 
   // Flujos de llegada de todos los municipios para el tooltip (independiente del municipio seleccionado)
@@ -233,35 +204,46 @@ export default function App() {
     return mapa;
   }, [municipios, anios, grupoEtario]);
 
-  // Filtra arcos según las correspondencias activas cuando está en modo correspondencia
-  const arcosFiltrados = useMemo(() => {
-    if (tipoTraslado !== "correspondencia") return arcos;
-    return arcos.filter((arc) => {
-      const key = String(arc.source.id) + String(arc.target.id);
-      const correspondencia =
-        correspondecia_o_d[key as keyof typeof correspondecia_o_d];
-      return correspondenciasActivas.has(correspondencia);
-    });
-  }, [arcos, tipoTraslado, correspondenciasActivas]);
-
   const idsConectados = useMemo(() => {
-    if (!hoveredMunicipio) return null;
+    const activo = hoveredMunicipio || municipioSeleccionado;
+    if (!activo) return null;
     const ids = new Set<unknown>();
-    ids.add(hoveredMunicipio.id);
+    ids.add(activo.id);
     arcos.forEach((arc) => ids.add(arc.target.id));
     return ids;
-  }, [hoveredMunicipio, arcos]);
+  }, [hoveredMunicipio, municipioSeleccionado, arcos]);
+
+  // Rutas filtradas: hover o selección muestran solo las del municipio activo
+  const rutasMunicipio = useMemo(() => {
+    const activo = hoveredMunicipio || municipioSeleccionado;
+    if (!rutas || !activo) return null;
+    const cve = activo.properties.CVE_ENT + activo.properties.CVE_MUN;
+    return rutas.filter(
+      (r) => r.properties.CVE_ENT + r.properties.CVE_MUN === cve,
+    );
+  }, [rutas, hoveredMunicipio, municipioSeleccionado]);
 
   const escalaAncho = useMemo(() => {
-    if (!arcosFiltrados || arcosFiltrados.length === 0) return () => 1;
-    const valores = arcosFiltrados.map((a) => Math.abs(a.value));
+    if (!arcos || arcos.length === 0) return () => 1;
+    const valores = arcos.map((a) => Math.abs(a.value));
     return scaleLinear()
       .domain([Math.min(...valores), Math.max(...valores)])
       .range([
         0.5 + 0.006 * Math.min(...valores),
         0.5 + 0.006 * Math.max(...valores),
       ]);
-  }, [arcosFiltrados]);
+  }, [arcos]);
+
+  // Todos los arcos para el modo "mostrar todos los traslados"
+  const todosArcosInteractivo = useMemo(() => {
+    if (!mostrarTodosArcos || !municipios) return [];
+    return calcularArcosPuro(municipios, [anios[0], anios[1]], grupoEtario);
+  }, [mostrarTodosArcos, municipios, anios, grupoEtario]);
+
+  const escalaAnchoTodos = useMemo(
+    () => escalaAnchoDeArcos(todosArcosInteractivo),
+    [todosArcosInteractivo],
+  );
 
   // — Colores de municipio (compartido entre modos) —
   function colorMunicipio(d: {
@@ -281,18 +263,24 @@ export default function App() {
     const estiloBase = {
       backgroundColor: "rgba(8,14,28,0.92)",
       color: "white",
-      fontSize: "12px",
+      fontSize: "14px",
       borderRadius: "6px",
       padding: "8px 12px",
       lineHeight: "1.6",
       pointerEvents: "none" as const,
     };
 
-    if (layer?.id === "arc" || layer?.id === "arc-interactivo") {
+    if (layer?.id === "rutas-municipio") {
+      const ruta = object as Ruta;
+      return {
+        html: `<div style="font-weight:600;margin-bottom:2px">Ruta migratoria</div><div style="color:rgba(255,255,255,0.6)">Desde ${ruta.properties.NOMGEO}</div>`,
+        style: estiloBase,
+      };
+    }
+
+    if (layer?.id === "arc" || layer?.id === "arc-interactivo" || layer?.id === "arc-todos") {
       const flujo = object as FlujoMigratorio;
       const key = String(flujo.source.id) + String(flujo.target.id);
-      const correspondencia =
-        correspondecia_o_d[key as keyof typeof correspondecia_o_d];
       const sentido = sentido_o_d[key as keyof typeof sentido_o_d];
       return {
         html: `
@@ -303,7 +291,6 @@ export default function App() {
           </div>
           <div>Traslados: <b>${flujo.value.toLocaleString("en")}</b></div>
           ${sentido ? `<div style="color:rgba(255,255,255,0.7)">Sentido: ${sentido}</div>` : ""}
-          ${correspondencia ? `<div style="color:rgba(255,255,255,0.7)">Correspondencia: ${correspondencia}</div>` : ""}
         `,
         style: { ...estiloBase, maxWidth: "260px" },
       };
@@ -319,7 +306,7 @@ export default function App() {
           ${municipio.properties.NOMGEO},
           <span style="font-weight:400;color:rgba(255,255,255,0.65)">${municipio.properties.NOM_ENT}</span>
         </div>
-        <div style="color:rgba(255,255,255,0.5);font-size:11px;margin-bottom:2px">${etiquetaGrupo}</div>
+        <div style="color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:2px">${etiquetaGrupo}</div>
         <div>
           <span style="color:${rgbToHex(COLOR_ORIGEN)}">↑</span>
           Traslados de salida: <b>${salidas.toLocaleString("en")}</b>
@@ -337,7 +324,26 @@ export default function App() {
   const capasNarrativa = useMemo((): Layer[] => {
     if (!municipios) return [];
 
-    const capaBase = new GeoJsonLayer<PropiedadesMunicipio>({
+    // Escena 2 ("datos"): todos los municipios en color neutro uniforme
+    const capaBaseNeutra = new GeoJsonLayer<PropiedadesMunicipio>({
+      id: "geojson-narrativa-neutra",
+      data: municipios,
+      stroked: true,
+      filled: true,
+      getFillColor: [...COLOR_SIN_ESTACION, 150] as [
+        number,
+        number,
+        number,
+        number,
+      ],
+      getLineColor: [75, 105, 160, 100],
+      getLineWidth: 1,
+      lineWidthUnits: "pixels",
+      pickable: false,
+    });
+
+    // Escena 3+ ("detencion"): distinción dorado/neutro según em==1
+    const capaBaseEstaciones = new GeoJsonLayer<PropiedadesMunicipio>({
       id: "geojson-narrativa",
       data: municipios,
       stroked: true,
@@ -350,138 +356,167 @@ export default function App() {
       pickable: false,
     });
 
-    const capaRutas = mostrarRutas
-      ? new GeoJsonLayer({
-          id: "rutas-narrativa",
-          data: rutas,
-          stroked: true,
-          filled: false,
-          getLineColor: [255, 255, 255],
-          getLineWidth: 2,
-          lineWidthUnits: "pixels",
-          pickable: false,
-        })
-      : null;
+    const capaRutas = new GeoJsonLayer({
+      id: "rutas-narrativa",
+      data: rutas,
+      stroked: true,
+      filled: false,
+      getLineColor: [255, 255, 255, 160],
+      getLineWidth: 2,
+      lineWidthUnits: "pixels",
+      pickable: false,
+    });
 
-    // Escenas 0 y -1: solo mapa base, sin arcos
-    if (escenaActiva <= 0) {
-      return [capaBase, capaRutas].filter(Boolean) as Layer[];
+    // Escenas 0 y 1 (imágenes): solo mapa base sin arcos ni rutas
+    if (escenaActiva <= 1) {
+      return [capaBaseNeutra] as Layer[];
     }
 
-    // Escenas 1 y 4: todos los arcos, animados por año
-    if (escenaActiva === 1 || escenaActiva === 4) {
-      const grupo = escenaActiva === 4 ? "total_infancias" : "total";
+    // Escena 2: todos los arcos en color neutro + rutas
+    if (escenaActiva === 2) {
+      const todosArcos = calcularArcosPuro(municipios, [2017, 2024], "total");
+      const escala2 = escalaAnchoDeArcos(todosArcos);
+      const capaArcos = new ArcLayer<FlujoMigratorio>({
+        id: "arc-narrativa-2",
+        data: todosArcos,
+        pickable: false,
+        getSourcePosition: (d) => d.source.properties.centroid,
+        getTargetPosition: (d) => d.target.properties.centroid,
+        getSourceColor: [...COLOR_NEUTRO, 80] as [
+          number,
+          number,
+          number,
+          number,
+        ],
+        getTargetColor: [...COLOR_NEUTRO, 160] as [
+          number,
+          number,
+          number,
+          number,
+        ],
+        getWidth: (d) => escala2(Math.abs(d.value)),
+        getHeight: 0.5,
+      });
+      return [capaBaseNeutra, capaRutas, capaArcos] as Layer[];
+    }
+
+    // Escena 3: detención — dorado si destino tiene em=1, neutro si no
+    if (escenaActiva === 3) {
+      const todosArcos = calcularArcosPuro(municipios, [2017, 2024], "total");
+      const escala3 = escalaAnchoDeArcos(todosArcos);
+      const capaArcos = new ArcLayer<FlujoMigratorio>({
+        id: "arc-narrativa-3",
+        data: todosArcos,
+        pickable: false,
+        getSourcePosition: (d) => d.source.properties.centroid,
+        getTargetPosition: (d) => d.target.properties.centroid,
+        getSourceColor: (d) => {
+          const esDetencion =
+            dictEstaciones[
+              d.target.properties.CVE_ENT + d.target.properties.CVE_MUN
+            ] === 1;
+          return esDetencion
+            ? ([...COLOR_DETENCION, 110] as [number, number, number, number])
+            : ([...COLOR_NEUTRO, 35] as [number, number, number, number]);
+        },
+        getTargetColor: (d) => {
+          const esDetencion =
+            dictEstaciones[
+              d.target.properties.CVE_ENT + d.target.properties.CVE_MUN
+            ] === 1;
+          return esDetencion
+            ? ([...COLOR_DETENCION, 230] as [number, number, number, number])
+            : ([...COLOR_NEUTRO, 55] as [number, number, number, number]);
+        },
+        getWidth: (d) => escala3(Math.abs(d.value)),
+        getHeight: 0.5,
+        updateTriggers: {
+          getSourceColor: [dictEstaciones],
+          getTargetColor: [dictEstaciones],
+        },
+      });
+      return [capaBaseEstaciones, capaRutas, capaArcos] as Layer[];
+    }
+
+    // Escena 4: sentido — colores origen/destino estáticos (2017-2024)
+    if (escenaActiva === 4) {
+      const todosArcos = calcularArcosPuro(municipios, [2017, 2024], "total");
+      const escala4 = escalaAnchoDeArcos(todosArcos);
+      const capaArcos = new ArcLayer<FlujoMigratorio>({
+        id: "arc-narrativa-4",
+        data: todosArcos,
+        pickable: false,
+        getSourcePosition: (d) => d.source.properties.centroid,
+        getTargetPosition: (d) => d.target.properties.centroid,
+        getSourceColor: [...COLOR_ORIGEN, 120] as [
+          number,
+          number,
+          number,
+          number,
+        ],
+        getTargetColor: [...COLOR_DESTINO, 230] as [
+          number,
+          number,
+          number,
+          number,
+        ],
+        getWidth: (d) => escala4(Math.abs(d.value)),
+        getHeight: 0.5,
+      });
+      return [capaBaseEstaciones, capaRutas, capaArcos] as Layer[];
+    }
+
+    // Escena 5: menores — arcos infancias animados por año
+    if (escenaActiva === 5) {
       const arcosAnim = calcularArcosPuro(
         municipios,
         [2017, anioMaxNarrativa],
-        grupo,
+        "total_infancias",
       );
-      const escala = escalaAnchoDeArcos(arcosAnim);
+      const escala5 = escalaAnchoDeArcos(arcosAnim);
       const capaArcos = new ArcLayer<FlujoMigratorio>({
-        id: `arc-narrativa-${escenaActiva}`,
+        id: "arc-narrativa-5",
         data: arcosAnim,
         pickable: false,
         getSourcePosition: (d) => d.source.properties.centroid,
         getTargetPosition: (d) => d.target.properties.centroid,
-        getSourceColor: [...COLOR_ORIGEN, 130] as [
+        getSourceColor: [...COLOR_MENORES, 120] as [
           number,
           number,
           number,
           number,
         ],
-        getTargetColor: [...COLOR_DESTINO, 240] as [
+        getTargetColor: [...COLOR_MENORES, 240] as [
           number,
           number,
           number,
           number,
         ],
-        getWidth: (d) => escala(Math.abs(d.value)),
+        getWidth: (d) => escala5(Math.abs(d.value)),
         getHeight: 0.5,
       });
-      return [capaBase, capaRutas, capaArcos].filter(Boolean) as Layer[];
+      return [capaBaseEstaciones, capaRutas, capaArcos] as Layer[];
     }
 
-    // Escena 2: solo arcos con destino en municipio con estación migratoria
-    if (escenaActiva === 2) {
-      const todosArcos = calcularArcosPuro(municipios, [2017, 2024], "total");
-      const arcosEstacion = todosArcos.filter(
-        (arc) =>
-          dictEstaciones[
-            arc.target.properties.CVE_ENT + arc.target.properties.CVE_MUN
-          ] == 1,
-      );
-      const idsDestino = new Set(arcosEstacion.map((a) => a.target.id));
-
-      const capaMunicipiosFiltrada = new GeoJsonLayer<PropiedadesMunicipio>({
-        id: "geojson-narrativa-2",
-        data: municipios,
-        stroked: true,
-        filled: true,
-        getFillColor: (d) => {
-          const conEstacion =
-            dictEstaciones[d.properties.CVE_ENT + d.properties.CVE_MUN] == 1;
-          if (conEstacion) return [...COLOR_CON_ESTACION, 230];
-          return [20, 28, 55, 60]; // muy atenuado
-        },
-        updateTriggers: { getFillColor: [dictEstaciones] },
-        getLineColor: [75, 105, 160, 60],
-        getLineWidth: 1,
-        lineWidthUnits: "pixels",
-        pickable: false,
-      });
-
-      const escala2 = escalaAnchoDeArcos(arcosEstacion);
-      const capaArcos = new ArcLayer<FlujoMigratorio>({
-        id: "arc-narrativa-2",
-        data: arcosEstacion,
-        pickable: false,
-        getSourcePosition: (d) => d.source.properties.centroid,
-        getTargetPosition: (d) => d.target.properties.centroid,
-        getSourceColor: [255, 180, 30, 120] as [number, number, number, number],
-        getTargetColor: [255, 165, 0, 220] as [number, number, number, number],
-        getWidth: (d) => escala2(Math.abs(d.value)),
-        getHeight: 0.5,
-      });
-      void idsDestino;
-      return [capaMunicipiosFiltrada, capaRutas, capaArcos].filter(
-        Boolean,
-      ) as Layer[];
-    }
-
-    // Escena 3: solo arcos fuera de ruta
-    if (escenaActiva === 3) {
-      const todosArcos = calcularArcosPuro(municipios, [2017, 2024], "total");
-      const arcosFueraRuta = todosArcos.filter((arc) => {
-        const key = String(arc.source.id) + String(arc.target.id);
-        return (
-          correspondecia_o_d[key as keyof typeof correspondecia_o_d] ===
-          "Dispersión fuera de las rutas"
-        );
-      });
-      const escala3 = escalaAnchoDeArcos(arcosFueraRuta);
-      const capaArcos = new ArcLayer<FlujoMigratorio>({
-        id: "arc-narrativa-3",
-        data: arcosFueraRuta,
-        pickable: false,
-        getSourcePosition: (d) => d.source.properties.centroid,
-        getTargetPosition: (d) => d.target.properties.centroid,
-        getSourceColor: [255, 75, 75, 130] as [number, number, number, number],
-        getTargetColor: [255, 75, 75, 220] as [number, number, number, number],
-        getWidth: (d) => escala3(Math.abs(d.value)),
-        getHeight: 0.5,
-      });
-      return [capaBase, capaRutas, capaArcos].filter(Boolean) as Layer[];
-    }
-
-    return [capaBase, capaRutas].filter(Boolean) as Layer[];
+    return [capaBaseEstaciones] as Layer[];
   }, [escenaActiva, municipios, rutas, dictEstaciones, anioMaxNarrativa]);
 
   // — Capas para el modo interactivo —
+  const hayActivo = !!(hoveredMunicipio || municipioSeleccionado);
+
+  // Handler de click: toggle — mismo municipio deselecciona, otro selecciona
+  const onClickMunicipio = ({ object }: PickingInfo) => {
+    const m = object as Municipio | null | undefined;
+    setMunicipioSeleccionado((prev) =>
+      m?.id != null && m.id === prev?.id ? null : (m ?? null),
+    );
+  };
+
   const capasInteractivas: Layer[] = [
     new GeoJsonLayer<PropiedadesMunicipio>({
       id: "geojson",
       data: municipios,
-      opacity: hoveredMunicipio ? 0.08 : 1,
+      opacity: hayActivo ? 0.08 : 1,
       stroked: true,
       filled: true,
       getFillColor: colorMunicipio,
@@ -491,7 +526,7 @@ export default function App() {
       lineWidthUnits: "pixels",
       pickable: true,
       onHover: ({ object }) => setHoveredMunicipio(object || null),
-      onClick: ({ object }) => setHoveredMunicipio(object || null),
+      onClick: onClickMunicipio,
     }),
     idsConectados &&
       new GeoJsonLayer<PropiedadesMunicipio>({
@@ -507,21 +542,79 @@ export default function App() {
         lineWidthUnits: "pixels",
         pickable: true,
         onHover: ({ object }) => setHoveredMunicipio(object || null),
-        onClick: ({ object }) => setHoveredMunicipio(object || null),
+        onClick: onClickMunicipio,
       }),
-    mostrarRutas &&
-      new GeoJsonLayer({
-        id: "rutas",
-        data: rutas,
-        stroked: true,
-        filled: false,
-        getLineColor: [255, 255, 255],
-        getLineWidth: 2,
-        lineWidthUnits: "pixels",
+    // Rutas: municipio activo → filtradas (pickables si están bloqueadas por click)
+    //        checkbox ON sin activo → todas las rutas, tenues
+    rutasMunicipio
+      ? new GeoJsonLayer<PropiedadesCarretera>({
+          id: "rutas-municipio",
+          data: rutasMunicipio,
+          stroked: true,
+          filled: false,
+          getLineColor: [255, 255, 255, 220] as [
+            number,
+            number,
+            number,
+            number,
+          ],
+          getLineWidth: 2.5,
+          lineWidthUnits: "pixels",
+          pickable: !!municipioSeleccionado && !hoveredMunicipio,
+        })
+      : mostrarRutas &&
+        new GeoJsonLayer<Ruta>({
+          id: "rutas",
+          data: rutas,
+          stroked: true,
+          filled: false,
+          getLineColor: [255, 255, 255, 70] as [number, number, number, number],
+          getLineWidth: 1.5,
+          lineWidthUnits: "pixels",
+          pickable: false,
+        }),
+    // Todos los traslados — degradado origen/destino con anchos escalados, hoverable
+    mostrarTodosArcos &&
+      new ArcLayer<FlujoMigratorio>({
+        id: "arc-todos",
+        data: todosArcosInteractivo,
+        pickable: !hayActivo,
+        onHover: ({ object }) => {
+          setClaveArcHover(
+            object ? String(object.source.id) + String(object.target.id) : null,
+          );
+        },
+        getSourcePosition: (d) => d.source.properties.centroid,
+        getTargetPosition: (d) => d.target.properties.centroid,
+        getSourceColor: (d) => {
+          const arcKey = String(d.source.id) + String(d.target.id);
+          const esHover = claveArcHover === arcKey;
+          const hayHover = claveArcHover !== null;
+          const alpha = hayHover ? (esHover ? 210 : 30) : 120;
+          return [...COLOR_ORIGEN, alpha] as [number, number, number, number];
+        },
+        getTargetColor: (d) => {
+          const arcKey = String(d.source.id) + String(d.target.id);
+          const esHover = claveArcHover === arcKey;
+          const hayHover = claveArcHover !== null;
+          const alpha = hayHover ? (esHover ? 255 : 40) : 230;
+          return [...COLOR_DESTINO, alpha] as [number, number, number, number];
+        },
+        getWidth: (d) => {
+          const arcKey = String(d.source.id) + String(d.target.id);
+          const base = escalaAnchoTodos(Math.abs(d.value));
+          return claveArcHover === arcKey ? Math.max(base * 2, 3) : base;
+        },
+        getHeight: 0.5,
+        updateTriggers: {
+          getSourceColor: [claveArcHover],
+          getTargetColor: [claveArcHover],
+          getWidth: [claveArcHover],
+        },
       }),
     new ArcLayer<FlujoMigratorio>({
       id: "arc-interactivo",
-      data: arcosFiltrados,
+      data: arcos,
       pickable: true,
       onHover: ({ object }) => {
         setClaveArcHover(
@@ -535,40 +628,14 @@ export default function App() {
         const esHover = claveArcHover === arcKey;
         const hayHover = claveArcHover !== null;
         const alpha = hayHover ? (esHover ? 210 : 18) : 130;
-        if (tipoTraslado === "sentido") {
-          return [...COLOR_ORIGEN, alpha] as [number, number, number, number];
-        }
-        const correspondencia =
-          correspondecia_o_d[arcKey as keyof typeof correspondecia_o_d];
-        const color = DICT_COLOR_CORRESPONDENCIA[correspondencia] ?? [
-          150, 150, 150,
-        ];
-        return [...color, hayHover ? (esHover ? 160 : 18) : 75] as [
-          number,
-          number,
-          number,
-          number,
-        ];
+        return [...COLOR_ORIGEN, alpha] as [number, number, number, number];
       },
       getTargetColor: (d) => {
         const arcKey = String(d.source.id) + String(d.target.id);
         const esHover = claveArcHover === arcKey;
         const hayHover = claveArcHover !== null;
         const alpha = hayHover ? (esHover ? 255 : 22) : 240;
-        if (tipoTraslado === "sentido") {
-          return [...COLOR_DESTINO, alpha] as [number, number, number, number];
-        }
-        const correspondencia =
-          correspondecia_o_d[arcKey as keyof typeof correspondecia_o_d];
-        const color = DICT_COLOR_CORRESPONDENCIA[correspondencia] ?? [
-          150, 150, 150,
-        ];
-        return [...color, hayHover ? (esHover ? 255 : 22) : 240] as [
-          number,
-          number,
-          number,
-          number,
-        ];
+        return [...COLOR_DESTINO, alpha] as [number, number, number, number];
       },
       getWidth: (d) => {
         const arcKey = String(d.source.id) + String(d.target.id);
@@ -577,8 +644,8 @@ export default function App() {
       },
       getHeight: () => 0.5 + Math.random() * 0.001,
       updateTriggers: {
-        getSourceColor: [tipoTraslado, claveArcHover],
-        getTargetColor: [tipoTraslado, claveArcHover],
+        getSourceColor: [claveArcHover],
+        getTargetColor: [claveArcHover],
         getWidth: [claveArcHover],
       },
     }),
@@ -595,6 +662,13 @@ export default function App() {
           initialViewState={ESTADO_INICIAL_MAPA}
           controller={modoInteractivo}
           getTooltip={modoInteractivo ? getTooltip : undefined}
+          onClick={
+            modoInteractivo
+              ? ({ object }) => {
+                  if (!object) setMunicipioSeleccionado(null);
+                }
+              : undefined
+          }
         >
           <Map reuseMaps mapStyle={ESTILO_MAPA} />
         </DeckGL>
@@ -611,8 +685,8 @@ export default function App() {
         />
       )}
 
-      {/* Indicador de rango de años — escenas 1 y 4 */}
-      {!modoInteractivo && [1, 4].includes(escenaActiva) && (
+      {/* Indicador de rango de años — escena 5 (menores) */}
+      {!modoInteractivo && escenaActiva === 5 && (
         <div
           style={{
             position: "fixed",
@@ -623,10 +697,7 @@ export default function App() {
             fontSize: 26,
             fontWeight: 700,
             letterSpacing: 3,
-            color:
-              escenaActiva === 4
-                ? "rgba(255,70,160,0.9)"
-                : "rgba(30,210,255,0.9)",
+            color: "rgba(180, 100, 255,0.9)",
             textShadow: "0 2px 16px rgba(0,0,0,0.9)",
             pointerEvents: "none",
             transition: "color 0.3s",
@@ -634,6 +705,34 @@ export default function App() {
         >
           {anioMaxNarrativa === 2017 ? "2017" : `2017–${anioMaxNarrativa}`}
         </div>
+      )}
+
+      {/* Botón volver a narrativa */}
+      {modoInteractivo && (
+        <button
+          onClick={() => {
+            setModoInteractivo(false);
+            setMunicipioSeleccionado(null);
+            setHoveredMunicipio(null);
+          }}
+          style={{
+            position: "fixed",
+            top: 16,
+            right: 16,
+            zIndex: 10,
+            background: "rgba(10,15,30,0.88)",
+            border: "1px solid rgba(255,255,255,0.18)",
+            borderRadius: 6,
+            color: "rgba(255,255,255,0.75)",
+            fontSize: 11,
+            letterSpacing: 1.5,
+            padding: "6px 14px",
+            cursor: "pointer",
+            backdropFilter: "blur(4px)",
+          }}
+        >
+          ← VOLVER
+        </button>
       )}
 
       {/* Panel de controles — solo en modo interactivo */}
@@ -644,10 +743,8 @@ export default function App() {
             setPanelAbierto={setPanelAbierto}
             mostrarRutas={mostrarRutas}
             setMostrarRutas={setMostrarRutas}
-            tipoTraslado={tipoTraslado}
-            setTipoTraslado={setTipoTraslado}
-            correspondenciasActivas={correspondenciasActivas}
-            toggleCorrespondencia={toggleCorrespondencia}
+            mostrarTodosArcos={mostrarTodosArcos}
+            setMostrarTodosArcos={setMostrarTodosArcos}
             anios={anios}
             cambioAnios={cambioAnios}
             grupoEtario={grupoEtario}

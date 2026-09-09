@@ -6,7 +6,7 @@ import type {
   LineString,
 } from "geojson";
 
-export type PropiedadesCarretera = { NOMGEO: string };
+export type PropiedadesCarretera = { NOMGEO: string; CVE_ENT: string; CVE_MUN: string };
 
 export type GrupoEtario = { [key: string]: number };
 export type FlujoPorAnio = { [anio: string]: GrupoEtario };

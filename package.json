@@ -16,15 +16,17 @@
     "@loaders.gl/csv": "^4.3.4",
     "@loaders.gl/gltf": "^4.3.4",
     "@loaders.gl/json": "^4.3.4",
-    "@mui/material": "^7.3.0",
     "@mui/icons-material": "^7.3.4",
+    "@mui/material": "^7.3.0",
+    "@types/three": "^0.185.4",
     "d3": "^7.9.0",
     "deck.gl": "^9.1.13",
     "mapbox-gl": "^3.14.0",
     "maplibre-gl": "^5.6.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-map-gl": "^8.0.4"
+    "react-map-gl": "^8.0.4",
+    "three": "^0.185.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
