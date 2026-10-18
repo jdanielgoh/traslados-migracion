@@ -231,24 +231,27 @@ export function NarrativaScroll({ onEscenaChange, onTerminar }: Props) {
                 color: "rgba(255,255,255,0.45)",
                 fontSize: 13,
                 letterSpacing: 2.5,
+                m: 0,
+                textAlign: "center",
               }}
             >
               DESLIZA PARA CONTINUAR
             </Typography>
             <Box
               sx={{
-                width: 0,
-                height: 0,
-                borderLeft: "7px solid transparent",
-                borderRight: "7px solid transparent",
-                borderTop: "10px solid rgba(255,255,255,0.35)",
+                display: "flex",
+                justifyContent: "center",
                 animation: "pulso 1.4s ease-in-out infinite",
                 "@keyframes pulso": {
                   "0%,100%": { opacity: 0.2, transform: "translateY(-5px)" },
                   "50%": { opacity: 0.8, transform: "translateY(5px)" },
                 },
               }}
-            />
+            >
+              <svg width="14" height="10" viewBox="0 0 14 10" style={{ display: "block" }}>
+                <polygon points="0,0 14,0 7,10" fill="rgba(255,255,255,0.4)" />
+              </svg>
+            </Box>
           </div>
         )}
       </div>
@@ -276,12 +279,16 @@ function TituloLanding({ visible }: { visible: boolean }) {
       <div
         style={{
           textAlign: "center",
-          maxWidth: 700,
-          padding: "0 32px",
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0 10vw",
+          boxSizing: "border-box",
           background:
-            "radial-gradient(ellipse at center, rgba(8,14,28,0.7) 0%, transparent 75%)",
-          paddingTop: 60,
-          paddingBottom: 60,
+            "radial-gradient(ellipse at center, rgba(4,8,20,0.92) 0%, rgba(4,8,20,0.55) 55%, transparent 80%)",
         }}
       >
         <Typography
@@ -292,17 +299,17 @@ function TituloLanding({ visible }: { visible: boolean }) {
             lineHeight: 1.25,
             letterSpacing: -0.5,
             mb: 1.5,
-            textShadow: "0 2px 24px rgba(0,0,0,0.9)",
+            textShadow: "0 2px 8px rgba(0,0,0,1), 0 4px 32px rgba(0,0,0,1), 0 8px 60px rgba(0,0,0,0.9)",
           }}
         >
           La dispersión como una política migratoria de desgaste
         </Typography>
         <Typography
           sx={{
-            color: "rgba(255,255,255,0.55)",
+            color: "rgba(255,255,255,0.9)",
             fontSize: 18,
             fontStyle: "italic",
-            textShadow: "0 1px 12px rgba(0,0,0,0.8)",
+            textShadow: "0 1px 6px rgba(0,0,0,1), 0 2px 20px rgba(0,0,0,1)",
           }}
         >
           Una aproximación teórica y de análisis de datos
@@ -413,28 +420,56 @@ function Viñeta({
       {/* CTA (escena menores) */}
       {item.cta && (
         <Box sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 1 }}>
-          <Button
-            component="a"
-            href={`${import.meta.env.BASE_URL}informe_borrador.pdf`}
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="outlined"
-            size="small"
-            sx={{
-              color: "rgba(255,255,255,0.85)",
-              borderColor: "rgba(255,255,255,0.3)",
-              fontSize: 14,
-              letterSpacing: 1.2,
-              py: 0.75,
-              "&:hover": {
-                borderColor: "white",
-                color: "white",
-                backgroundColor: "rgba(255,255,255,0.06)",
-              },
-            }}
-          >
-            CONOCE EL INFORME COMPLETO →
-          </Button>
+          <Box sx={{ display: "flex", gap: 0.75 }}>
+            <Button
+              component="a"
+              href={`${import.meta.env.BASE_URL}informe_final_esp.pdf`}
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="outlined"
+              size="small"
+              sx={{
+                flex: 1,
+                color: "rgba(255,255,255,0.85)",
+                borderColor: "rgba(255,255,255,0.3)",
+                fontSize: 12,
+                letterSpacing: 1,
+                py: 0.75,
+                "&:hover": {
+                  borderColor: "white",
+                  color: "white",
+                  backgroundColor: "rgba(255,255,255,0.06)",
+                },
+              }}
+            >
+              INFORME (ESP) →
+            </Button>
+            <Button
+              component="a"
+              href={`${import.meta.env.BASE_URL}informe_english.pdf`}
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="outlined"
+              size="small"
+              sx={{
+                flex: 1,
+                color: "rgba(255,255,255,0.85)",
+                borderColor: "rgba(255,255,255,0.3)",
+                fontSize: 12,
+                letterSpacing: 1,
+                py: 0.75,
+                "&:hover": {
+                  borderColor: "white",
+                  color: "white",
+                  backgroundColor: "rgba(255,255,255,0.06)",
+                },
+              }}
+            >
+              REPORT (ENG) →
+            </Button>
+          </Box>
           <Button
             onClick={onTerminar}
             size="small"

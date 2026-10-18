@@ -46,10 +46,16 @@ function NomenclaturaSentido() {
         }}
       />
       <Box sx={{ display: "flex", justifyContent: "space-between", mt: 0.25 }}>
-        <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.6)", fontSize: 14 }}>
+        <Typography
+          variant="caption"
+          sx={{ color: "rgba(255,255,255,0.6)", fontSize: 14 }}
+        >
           Origen
         </Typography>
-        <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.6)", fontSize: 14 }}>
+        <Typography
+          variant="caption"
+          sx={{ color: "rgba(255,255,255,0.6)", fontSize: 14 }}
+        >
           Destino
         </Typography>
       </Box>
@@ -59,8 +65,14 @@ function NomenclaturaSentido() {
 
 function NomenclaturaEstaciones() {
   const items = [
-    { color: COLOR_CON_ESTACION, label: "Ha contado con estación migratoria o estancia provisional" },
-    { color: COLOR_SIN_ESTACION, label: "Sin infraestructuras oficiales de detención migratoria" },
+    {
+      color: COLOR_CON_ESTACION,
+      label: "Ha contado con estación migratoria o estancia provisional",
+    },
+    {
+      color: COLOR_SIN_ESTACION,
+      label: "Sin infraestructuras oficiales de detención migratoria",
+    },
   ];
   return (
     <Box sx={{ mt: 1.5 }}>
@@ -68,15 +80,28 @@ function NomenclaturaEstaciones() {
         Municipios con infraestructura de detención migratoria
       </Typography>
       {items.map(({ color, label }) => (
-        <Box key={label} sx={{ display: "flex", alignItems: "flex-start", mb: 0.6, gap: 0.75 }}>
+        <Box
+          key={label}
+          sx={{ display: "flex", alignItems: "flex-start", mb: 0.6, gap: 0.75 }}
+        >
           <Box
             sx={{
-              width: 12, height: 12, borderRadius: 0.5,
+              width: 12,
+              height: 12,
+              borderRadius: 0.5,
               backgroundColor: rgbToHex(color),
-              flexShrink: 0, mt: "2px",
+              flexShrink: 0,
+              mt: "2px",
             }}
           />
-          <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.7)", lineHeight: 1.4, fontSize: 14 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: "rgba(255,255,255,0.7)",
+              lineHeight: 1.4,
+              fontSize: 14,
+            }}
+          >
             {label}
           </Typography>
         </Box>
@@ -93,7 +118,11 @@ type Props = {
   mostrarTodosArcos: boolean;
   setMostrarTodosArcos: (v: boolean) => void;
   anios: number[];
-  cambioAnios: (event: Event, value: number | number[], activeThumb: number) => void;
+  cambioAnios: (
+    event: Event,
+    value: number | number[],
+    activeThumb: number,
+  ) => void;
   grupoEtario: string;
   setGrupoEtario: (v: string) => void;
 };
@@ -114,7 +143,8 @@ export function PanelControles({
       elevation={6}
       sx={{
         position: "absolute",
-        top: 16, left: 16,
+        top: 16,
+        left: 16,
         p: 1.5,
         borderRadius: 2,
         zIndex: 1,
@@ -123,7 +153,14 @@ export function PanelControles({
         backdropFilter: "blur(4px)",
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 0.25 }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          mb: 0.25,
+        }}
+      >
         <Typography sx={{ color: "white", fontWeight: 600, fontSize: 16 }}>
           Controles
         </Typography>
@@ -132,11 +169,32 @@ export function PanelControles({
           onClick={() => setPanelAbierto(!panelAbierto)}
           sx={{ color: "rgba(255,255,255,0.6)", p: 0.25 }}
         >
-          {panelAbierto ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />}
+          {panelAbierto ? (
+            <ExpandLess fontSize="small" />
+          ) : (
+            <ExpandMore fontSize="small" />
+          )}
         </IconButton>
       </Box>
 
       <Collapse in={panelAbierto} timeout="auto" unmountOnExit>
+        <Box
+          sx={{
+            maxHeight: "calc(100vh - 80px)",
+            overflowY: "auto",
+            overflowX: "hidden",
+            pr: 0.5,
+            "&::-webkit-scrollbar": { width: 4 },
+            "&::-webkit-scrollbar-track": { background: "transparent" },
+            "&::-webkit-scrollbar-thumb": {
+              background: "rgba(255,255,255,0.18)",
+              borderRadius: 2,
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+              background: "rgba(255,255,255,0.35)",
+            },
+          }}
+        >
         {/* Todos los traslados */}
         <FormControlLabel
           sx={{ ml: -0.5, mb: 0.25 }}
@@ -188,7 +246,7 @@ export function PanelControles({
 
         {/* Rango temporal */}
         <Typography sx={{ ...labelSx, mt: 1.5, mb: 0.5, display: "block" }}>
-          Rango temporal
+          Rango temporal | 2027 - Junio 2024
         </Typography>
         <Slider
           getAriaLabel={() => "Rango de años"}
@@ -214,20 +272,36 @@ export function PanelControles({
               value="total"
               sx={{ ml: -0.5 }}
               control={
-                <Radio size="small" sx={radioSx} onChange={(e) => setGrupoEtario(e.target.value)} />
+                <Radio
+                  size="small"
+                  sx={radioSx}
+                  onChange={(e) => setGrupoEtario(e.target.value)}
+                />
               }
               label={
-                <Typography sx={{ color: "rgba(255,255,255,0.9)", fontSize: 15 }}>Total</Typography>
+                <Typography
+                  sx={{ color: "rgba(255,255,255,0.9)", fontSize: 15 }}
+                >
+                  Total
+                </Typography>
               }
             />
             <FormControlLabel
               value="total_infancias"
               sx={{ ml: -0.5 }}
               control={
-                <Radio size="small" sx={radioSx} onChange={(e) => setGrupoEtario(e.target.value)} />
+                <Radio
+                  size="small"
+                  sx={radioSx}
+                  onChange={(e) => setGrupoEtario(e.target.value)}
+                />
               }
               label={
-                <Typography sx={{ color: "rgba(255,255,255,0.9)", fontSize: 15 }}>Menor de edad</Typography>
+                <Typography
+                  sx={{ color: "rgba(255,255,255,0.9)", fontSize: 15 }}
+                >
+                  Menor de edad
+                </Typography>
               }
             />
           </RadioGroup>
@@ -235,9 +309,80 @@ export function PanelControles({
 
         <NomenclaturaEstaciones />
 
-        <Typography sx={{ ...labelSx, mt: 1.5, fontSize: 14, lineHeight: 1.5, display: "block" }}>
+        <Typography
+          sx={{
+            ...labelSx,
+            mt: 1.5,
+            fontSize: 14,
+            lineHeight: 1.5,
+            display: "block",
+          }}
+        >
           Haz clic en un municipio para ver sus traslados.
         </Typography>
+
+        <Box sx={{ mt: 1.5 }}>
+          <Typography sx={{ ...labelSx, display: "block", mb: 0.5 }}>
+            Descargar informe
+          </Typography>
+          <Box sx={{ display: "flex", gap: 0.75 }}>
+            <Box
+              component="a"
+              href={`${import.meta.env.BASE_URL}informe_final_esp.pdf`}
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                flex: 1,
+                display: "block",
+                color: "rgba(255,255,255,0.75)",
+                border: "1px solid rgba(255,255,255,0.25)",
+                borderRadius: 1,
+                fontSize: 12,
+                letterSpacing: 0.8,
+                py: 0.6,
+                px: 1,
+                textAlign: "center",
+                textDecoration: "none",
+                "&:hover": {
+                  borderColor: "rgba(255,255,255,0.7)",
+                  color: "white",
+                  backgroundColor: "rgba(255,255,255,0.06)",
+                },
+              }}
+            >
+              ESP →
+            </Box>
+            <Box
+              component="a"
+              href={`${import.meta.env.BASE_URL}informe_english.pdf`}
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                flex: 1,
+                display: "block",
+                color: "rgba(255,255,255,0.75)",
+                border: "1px solid rgba(255,255,255,0.25)",
+                borderRadius: 1,
+                fontSize: 12,
+                letterSpacing: 0.8,
+                py: 0.6,
+                px: 1,
+                textAlign: "center",
+                textDecoration: "none",
+                "&:hover": {
+                  borderColor: "rgba(255,255,255,0.7)",
+                  color: "white",
+                  backgroundColor: "rgba(255,255,255,0.06)",
+                },
+              }}
+            >
+              ENG →
+            </Box>
+          </Box>
+        </Box>
+        </Box>
       </Collapse>
     </Paper>
   );

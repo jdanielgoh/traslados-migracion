@@ -192,16 +192,27 @@ export default function App() {
     [municipios, hoveredMunicipio, municipioSeleccionado, anios, grupoEtario],
   );
 
-  // Flujos de llegada de todos los municipios para el tooltip (independiente del municipio seleccionado)
-  const mapaLlegadas = useMemo(() => {
-    if (!municipios) return {} as Record<string, number>;
-    const todosArcos = calcularArcos(municipios, null);
-    const mapa: Record<string, number> = {};
+  // Totales de salida y llegada por municipio para el tooltip
+  const { mapaSalidas, mapaLlegadas } = useMemo(() => {
+    if (!municipios)
+      return {
+        mapaSalidas: {} as Record<string, number>,
+        mapaLlegadas: {} as Record<string, number>,
+      };
+    const todosArcos = calcularArcosPuro(
+      municipios,
+      [anios[0], anios[1]],
+      grupoEtario,
+    );
+    const salidas: Record<string, number> = {};
+    const llegadas: Record<string, number> = {};
     todosArcos.forEach((arc) => {
-      const id = String(arc.target.id);
-      mapa[id] = (mapa[id] || 0) + arc.value;
+      const srcId = String(arc.source.id);
+      const tgtId = String(arc.target.id);
+      salidas[srcId] = (salidas[srcId] || 0) + arc.value;
+      llegadas[tgtId] = (llegadas[tgtId] || 0) + arc.value;
     });
-    return mapa;
+    return { mapaSalidas: salidas, mapaLlegadas: llegadas };
   }, [municipios, anios, grupoEtario]);
 
   const idsConectados = useMemo(() => {
@@ -278,7 +289,11 @@ export default function App() {
       };
     }
 
-    if (layer?.id === "arc" || layer?.id === "arc-interactivo" || layer?.id === "arc-todos") {
+    if (
+      layer?.id === "arc" ||
+      layer?.id === "arc-interactivo" ||
+      layer?.id === "arc-todos"
+    ) {
       const flujo = object as FlujoMigratorio;
       const key = String(flujo.source.id) + String(flujo.target.id);
       const sentido = sentido_o_d[key as keyof typeof sentido_o_d];
@@ -297,7 +312,7 @@ export default function App() {
     }
 
     const municipio = object as Municipio;
-    const salidas = municipio.properties.valor || 0;
+    const salidas = mapaSalidas[String(municipio.id)] || 0;
     const llegadas = mapaLlegadas[String(municipio.id)] || 0;
     const etiquetaGrupo = grupoEtario === "total" ? "Total" : "Menores de edad";
     return {
@@ -568,7 +583,12 @@ export default function App() {
           data: rutas,
           stroked: true,
           filled: false,
-          getLineColor: [255, 255, 255, 70] as [number, number, number, number],
+          getLineColor: [200, 200, 200, 255] as [
+            number,
+            number,
+            number,
+            number,
+          ],
           getLineWidth: 1.5,
           lineWidthUnits: "pixels",
           pickable: false,
@@ -590,14 +610,38 @@ export default function App() {
           const arcKey = String(d.source.id) + String(d.target.id);
           const esHover = claveArcHover === arcKey;
           const hayHover = claveArcHover !== null;
-          const alpha = hayHover ? (esHover ? 210 : 30) : 120;
+          const activoId = (hoveredMunicipio || municipioSeleccionado)?.id;
+          const noRelacionado =
+            hayActivo &&
+            activoId != null &&
+            d.source.id !== activoId &&
+            d.target.id !== activoId;
+          const alpha = hayHover
+            ? esHover
+              ? 210
+              : 50
+            : noRelacionado
+              ? 50
+              : 120;
           return [...COLOR_ORIGEN, alpha] as [number, number, number, number];
         },
         getTargetColor: (d) => {
           const arcKey = String(d.source.id) + String(d.target.id);
           const esHover = claveArcHover === arcKey;
           const hayHover = claveArcHover !== null;
-          const alpha = hayHover ? (esHover ? 255 : 40) : 230;
+          const activoId = (hoveredMunicipio || municipioSeleccionado)?.id;
+          const noRelacionado =
+            hayActivo &&
+            activoId != null &&
+            d.source.id !== activoId &&
+            d.target.id !== activoId;
+          const alpha = hayHover
+            ? esHover
+              ? 255
+              : 50
+            : noRelacionado
+              ? 50
+              : 230;
           return [...COLOR_DESTINO, alpha] as [number, number, number, number];
         },
         getWidth: (d) => {
@@ -607,8 +651,16 @@ export default function App() {
         },
         getHeight: 0.5,
         updateTriggers: {
-          getSourceColor: [claveArcHover],
-          getTargetColor: [claveArcHover],
+          getSourceColor: [
+            claveArcHover,
+            hoveredMunicipio?.id,
+            municipioSeleccionado?.id,
+          ],
+          getTargetColor: [
+            claveArcHover,
+            hoveredMunicipio?.id,
+            municipioSeleccionado?.id,
+          ],
           getWidth: [claveArcHover],
         },
       }),
@@ -627,7 +679,7 @@ export default function App() {
         const arcKey = String(d.source.id) + String(d.target.id);
         const esHover = claveArcHover === arcKey;
         const hayHover = claveArcHover !== null;
-        const alpha = hayHover ? (esHover ? 210 : 18) : 130;
+        const alpha = hayHover ? (esHover ? 210 : 100) : 130;
         return [...COLOR_ORIGEN, alpha] as [number, number, number, number];
       },
       getTargetColor: (d) => {
@@ -656,7 +708,14 @@ export default function App() {
   return (
     <>
       {/* Mapa siempre fijo en el fondo */}
-      <div style={{ position: "fixed", inset: 0, zIndex: 0 }}>
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: modoInteractivo ? "auto" : "none",
+        }}
+      >
         <DeckGL
           layers={capasActivas}
           initialViewState={ESTADO_INICIAL_MAPA}
@@ -692,7 +751,7 @@ export default function App() {
             position: "fixed",
             bottom: 40,
             right: 40,
-            zIndex: 20,
+            zIndex: 0,
             fontFamily: "monospace",
             fontSize: 26,
             fontWeight: 700,
