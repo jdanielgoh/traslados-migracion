@@ -195,193 +195,193 @@ export function PanelControles({
             },
           }}
         >
-        {/* Todos los traslados */}
-        <FormControlLabel
-          sx={{ ml: -0.5, mb: 0.25 }}
-          control={
-            <Checkbox
-              checked={mostrarTodosArcos}
-              onChange={(e) => setMostrarTodosArcos(e.target.checked)}
-              size="small"
-              sx={{
-                color: "rgba(255,255,255,0.5)",
-                "&.Mui-checked": { color: "rgb(255,255,255)" },
-                p: "4px",
-              }}
-            />
-          }
-          label={
-            <Typography sx={{ color: "rgba(255,255,255,0.9)", fontSize: 15 }}>
-              Mostrar todos los traslados
-            </Typography>
-          }
-        />
+          {/* Todos los traslados */}
+          <FormControlLabel
+            sx={{ ml: -0.5, mb: 0.25 }}
+            control={
+              <Checkbox
+                checked={mostrarTodosArcos}
+                onChange={(e) => setMostrarTodosArcos(e.target.checked)}
+                size="small"
+                sx={{
+                  color: "rgba(255,255,255,0.5)",
+                  "&.Mui-checked": { color: "rgb(255,255,255)" },
+                  p: "4px",
+                }}
+              />
+            }
+            label={
+              <Typography sx={{ color: "rgba(255,255,255,0.9)", fontSize: 15 }}>
+                Mostrar todos los traslados
+              </Typography>
+            }
+          />
 
-        {/* Rutas migratorias */}
-        <FormControlLabel
-          sx={{ ml: -0.5, mb: 0.25 }}
-          control={
-            <Checkbox
-              checked={mostrarRutas}
-              onChange={(e) => setMostrarRutas(e.target.checked)}
-              size="small"
-              sx={{
-                color: "rgba(255,255,255,0.5)",
-                "&.Mui-checked": { color: "rgb(255,255,255)" },
-                p: "4px",
-              }}
-            />
-          }
-          label={
-            <Typography sx={{ color: "rgba(255,255,255,0.9)", fontSize: 15 }}>
-              Rutas migratorias históricas
-            </Typography>
-          }
-        />
+          {/* Rutas migratorias */}
+          <FormControlLabel
+            sx={{ ml: -0.5, mb: 0.25 }}
+            control={
+              <Checkbox
+                checked={mostrarRutas}
+                onChange={(e) => setMostrarRutas(e.target.checked)}
+                size="small"
+                sx={{
+                  color: "rgba(255,255,255,0.5)",
+                  "&.Mui-checked": { color: "rgb(255,255,255)" },
+                  p: "4px",
+                }}
+              />
+            }
+            label={
+              <Typography sx={{ color: "rgba(255,255,255,0.9)", fontSize: 15 }}>
+                Rutas migratorias históricas
+              </Typography>
+            }
+          />
 
-        {/* Gradiente de sentido */}
-        <Box sx={{ mt: 0.5 }}>
-          <NomenclaturaSentido />
-        </Box>
+          {/* Gradiente de sentido */}
+          <Box sx={{ mt: 0.5 }}>
+            <NomenclaturaSentido />
+          </Box>
 
-        {/* Rango temporal */}
-        <Typography sx={{ ...labelSx, mt: 1.5, mb: 0.5, display: "block" }}>
-          Rango temporal | 2027 - Junio 2024
-        </Typography>
-        <Slider
-          getAriaLabel={() => "Rango de años"}
-          value={anios}
-          onChange={cambioAnios}
-          valueLabelDisplay="auto"
-          getAriaValueText={textoAnio}
-          disableSwap
-          min={2017}
-          max={2024}
-          step={1}
-          sx={{
-            color: rgbToHex(COLOR_ORIGEN),
-            "& .MuiSlider-thumb": { width: 14, height: 14 },
-          }}
-        />
-
-        {/* Población */}
-        <FormControl fullWidth sx={{ mt: 0.5 }}>
-          <FormLabel sx={labelSx}>Población</FormLabel>
-          <RadioGroup defaultValue="total" name="grupo-etario">
-            <FormControlLabel
-              value="total"
-              sx={{ ml: -0.5 }}
-              control={
-                <Radio
-                  size="small"
-                  sx={radioSx}
-                  onChange={(e) => setGrupoEtario(e.target.value)}
-                />
-              }
-              label={
-                <Typography
-                  sx={{ color: "rgba(255,255,255,0.9)", fontSize: 15 }}
-                >
-                  Total
-                </Typography>
-              }
-            />
-            <FormControlLabel
-              value="total_infancias"
-              sx={{ ml: -0.5 }}
-              control={
-                <Radio
-                  size="small"
-                  sx={radioSx}
-                  onChange={(e) => setGrupoEtario(e.target.value)}
-                />
-              }
-              label={
-                <Typography
-                  sx={{ color: "rgba(255,255,255,0.9)", fontSize: 15 }}
-                >
-                  Menor de edad
-                </Typography>
-              }
-            />
-          </RadioGroup>
-        </FormControl>
-
-        <NomenclaturaEstaciones />
-
-        <Typography
-          sx={{
-            ...labelSx,
-            mt: 1.5,
-            fontSize: 14,
-            lineHeight: 1.5,
-            display: "block",
-          }}
-        >
-          Haz clic en un municipio para ver sus traslados.
-        </Typography>
-
-        <Box sx={{ mt: 1.5 }}>
-          <Typography sx={{ ...labelSx, display: "block", mb: 0.5 }}>
-            Descargar informe
+          {/* Rango temporal */}
+          <Typography sx={{ ...labelSx, mt: 1.5, mb: 0.5, display: "block" }}>
+            Rango temporal | 2017 - Junio 2024
           </Typography>
-          <Box sx={{ display: "flex", gap: 0.75 }}>
-            <Box
-              component="a"
-              href={`${import.meta.env.BASE_URL}informe_final_esp.pdf`}
-              download
-              target="_blank"
-              rel="noopener noreferrer"
-              sx={{
-                flex: 1,
-                display: "block",
-                color: "rgba(255,255,255,0.75)",
-                border: "1px solid rgba(255,255,255,0.25)",
-                borderRadius: 1,
-                fontSize: 12,
-                letterSpacing: 0.8,
-                py: 0.6,
-                px: 1,
-                textAlign: "center",
-                textDecoration: "none",
-                "&:hover": {
-                  borderColor: "rgba(255,255,255,0.7)",
-                  color: "white",
-                  backgroundColor: "rgba(255,255,255,0.06)",
-                },
-              }}
-            >
-              ESP →
-            </Box>
-            <Box
-              component="a"
-              href={`${import.meta.env.BASE_URL}informe_english.pdf`}
-              download
-              target="_blank"
-              rel="noopener noreferrer"
-              sx={{
-                flex: 1,
-                display: "block",
-                color: "rgba(255,255,255,0.75)",
-                border: "1px solid rgba(255,255,255,0.25)",
-                borderRadius: 1,
-                fontSize: 12,
-                letterSpacing: 0.8,
-                py: 0.6,
-                px: 1,
-                textAlign: "center",
-                textDecoration: "none",
-                "&:hover": {
-                  borderColor: "rgba(255,255,255,0.7)",
-                  color: "white",
-                  backgroundColor: "rgba(255,255,255,0.06)",
-                },
-              }}
-            >
-              ENG →
+          <Slider
+            getAriaLabel={() => "Rango de años"}
+            value={anios}
+            onChange={cambioAnios}
+            valueLabelDisplay="auto"
+            getAriaValueText={textoAnio}
+            disableSwap
+            min={2017}
+            max={2024}
+            step={1}
+            sx={{
+              color: rgbToHex(COLOR_ORIGEN),
+              "& .MuiSlider-thumb": { width: 14, height: 14 },
+            }}
+          />
+
+          {/* Población */}
+          <FormControl fullWidth sx={{ mt: 0.5 }}>
+            <FormLabel sx={labelSx}>Población</FormLabel>
+            <RadioGroup defaultValue="total" name="grupo-etario">
+              <FormControlLabel
+                value="total"
+                sx={{ ml: -0.5 }}
+                control={
+                  <Radio
+                    size="small"
+                    sx={radioSx}
+                    onChange={(e) => setGrupoEtario(e.target.value)}
+                  />
+                }
+                label={
+                  <Typography
+                    sx={{ color: "rgba(255,255,255,0.9)", fontSize: 15 }}
+                  >
+                    Total
+                  </Typography>
+                }
+              />
+              <FormControlLabel
+                value="total_infancias"
+                sx={{ ml: -0.5 }}
+                control={
+                  <Radio
+                    size="small"
+                    sx={radioSx}
+                    onChange={(e) => setGrupoEtario(e.target.value)}
+                  />
+                }
+                label={
+                  <Typography
+                    sx={{ color: "rgba(255,255,255,0.9)", fontSize: 15 }}
+                  >
+                    Menor de edad
+                  </Typography>
+                }
+              />
+            </RadioGroup>
+          </FormControl>
+
+          <NomenclaturaEstaciones />
+
+          <Typography
+            sx={{
+              ...labelSx,
+              mt: 1.5,
+              fontSize: 14,
+              lineHeight: 1.5,
+              display: "block",
+            }}
+          >
+            Haz clic en un municipio para ver sus traslados.
+          </Typography>
+
+          <Box sx={{ mt: 1.5 }}>
+            <Typography sx={{ ...labelSx, display: "block", mb: 0.5 }}>
+              Descargar informe
+            </Typography>
+            <Box sx={{ display: "flex", gap: 0.75 }}>
+              <Box
+                component="a"
+                href={`${import.meta.env.BASE_URL}informe_final_esp.pdf`}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  flex: 1,
+                  display: "block",
+                  color: "rgba(255,255,255,0.75)",
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  borderRadius: 1,
+                  fontSize: 12,
+                  letterSpacing: 0.8,
+                  py: 0.6,
+                  px: 1,
+                  textAlign: "center",
+                  textDecoration: "none",
+                  "&:hover": {
+                    borderColor: "rgba(255,255,255,0.7)",
+                    color: "white",
+                    backgroundColor: "rgba(255,255,255,0.06)",
+                  },
+                }}
+              >
+                ESP →
+              </Box>
+              <Box
+                component="a"
+                href={`${import.meta.env.BASE_URL}informe_english.pdf`}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  flex: 1,
+                  display: "block",
+                  color: "rgba(255,255,255,0.75)",
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  borderRadius: 1,
+                  fontSize: 12,
+                  letterSpacing: 0.8,
+                  py: 0.6,
+                  px: 1,
+                  textAlign: "center",
+                  textDecoration: "none",
+                  "&:hover": {
+                    borderColor: "rgba(255,255,255,0.7)",
+                    color: "white",
+                    backgroundColor: "rgba(255,255,255,0.06)",
+                  },
+                }}
+              >
+                ENG →
+              </Box>
             </Box>
           </Box>
-        </Box>
         </Box>
       </Collapse>
     </Paper>
