@@ -304,7 +304,7 @@ export default function App() {
             <span style="color:rgba(255,255,255,0.45)"> → </span>
             <b style="color:${rgbToHex(COLOR_DESTINO)}">${flujo.target.properties.NOMGEO}</b>
           </div>
-          <div>Traslados: <b>${flujo.value.toLocaleString("en")}</b></div>
+          <div>Personas trasladadas: <b>${flujo.value.toLocaleString("en")}</b></div>
           ${sentido ? `<div style="color:rgba(255,255,255,0.7)">Sentido: ${sentido}</div>` : ""}
         `,
         style: { ...estiloBase, maxWidth: "260px" },
@@ -324,11 +324,11 @@ export default function App() {
         <div style="color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:2px">${etiquetaGrupo}</div>
         <div>
           <span style="color:${rgbToHex(COLOR_ORIGEN)}">↑</span>
-          Traslados de salida: <b>${salidas.toLocaleString("en")}</b>
+          Personas que salieron: <b>${salidas.toLocaleString("en")}</b>
         </div>
         <div>
           <span style="color:${rgbToHex(COLOR_DESTINO)}">↓</span>
-          Traslados de llegada: <b>${llegadas.toLocaleString("en")}</b>
+          Personas que entraron: <b>${llegadas.toLocaleString("en")}</b>
         </div>
       `,
       style: estiloBase,

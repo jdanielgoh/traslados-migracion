@@ -212,7 +212,7 @@ export function PanelControles({
             }
             label={
               <Typography sx={{ color: "rgba(255,255,255,0.9)", fontSize: 15 }}>
-                Mostrar todos los traslados
+                Mostrar a todas las personas trasladadas
               </Typography>
             }
           />
