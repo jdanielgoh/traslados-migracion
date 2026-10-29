@@ -248,7 +248,12 @@ export function NarrativaScroll({ onEscenaChange, onTerminar }: Props) {
                 },
               }}
             >
-              <svg width="14" height="10" viewBox="0 0 14 10" style={{ display: "block" }}>
+              <svg
+                width="14"
+                height="10"
+                viewBox="0 0 14 10"
+                style={{ display: "block" }}
+              >
                 <polygon points="0,0 14,0 7,10" fill="rgba(255,255,255,0.4)" />
               </svg>
             </Box>
@@ -299,7 +304,8 @@ function TituloLanding({ visible }: { visible: boolean }) {
             lineHeight: 1.25,
             letterSpacing: -0.5,
             mb: 1.5,
-            textShadow: "0 2px 8px rgba(0,0,0,1), 0 4px 32px rgba(0,0,0,1), 0 8px 60px rgba(0,0,0,0.9)",
+            textShadow:
+              "0 2px 8px rgba(0,0,0,1), 0 4px 32px rgba(0,0,0,1), 0 8px 60px rgba(0,0,0,0.9)",
           }}
         >
           La dispersión como una política migratoria de desgaste
@@ -327,12 +333,7 @@ type ViñetaProps = {
   onTerminar: () => void;
 };
 
-function Viñeta({
-  item,
-  escenaActiva,
-  totalEscenas,
-  onTerminar,
-}: ViñetaProps) {
+function Viñeta({ item, escenaActiva, totalEscenas, onTerminar }: ViñetaProps) {
   const esImagenScene = item.id === "bus" || item.id === "van";
 
   return (
@@ -423,7 +424,7 @@ function Viñeta({
           <Box sx={{ display: "flex", gap: 0.75 }}>
             <Button
               component="a"
-              href={`${import.meta.env.BASE_URL}informe_final_esp.pdf`}
+              href={`${import.meta.env.BASE_URL}informe_esp_oct27.pdf`}
               download
               target="_blank"
               rel="noopener noreferrer"
@@ -447,7 +448,7 @@ function Viñeta({
             </Button>
             <Button
               component="a"
-              href={`${import.meta.env.BASE_URL}informe_english.pdf`}
+              href={`${import.meta.env.BASE_URL}informe_english_27oct.pdf`}
               download
               target="_blank"
               rel="noopener noreferrer"

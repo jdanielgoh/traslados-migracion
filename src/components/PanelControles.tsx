@@ -318,7 +318,8 @@ export function PanelControles({
               display: "block",
             }}
           >
-            Haz clic en un municipio para ver sus traslados.
+            Haz clic en un municipio para ver cuantas personas fueron
+            trasladadas.
           </Typography>
 
           <Box sx={{ mt: 1.5 }}>
@@ -328,7 +329,7 @@ export function PanelControles({
             <Box sx={{ display: "flex", gap: 0.75 }}>
               <Box
                 component="a"
-                href={`${import.meta.env.BASE_URL}informe_final_esp.pdf`}
+                href={`${import.meta.env.BASE_URL}informe_esp_oct27.pdf`}
                 download
                 target="_blank"
                 rel="noopener noreferrer"
@@ -355,7 +356,7 @@ export function PanelControles({
               </Box>
               <Box
                 component="a"
-                href={`${import.meta.env.BASE_URL}informe_english.pdf`}
+                href={`${import.meta.env.BASE_URL}informe_english_27oct.pdf`}
                 download
                 target="_blank"
                 rel="noopener noreferrer"
