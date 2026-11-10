@@ -329,7 +329,7 @@ export function PanelControles({
             <Box sx={{ display: "flex", gap: 0.75 }}>
               <Box
                 component="a"
-                href={`${import.meta.env.BASE_URL}informe_esp_oct27.pdf`}
+                href={`${import.meta.env.BASE_URL}informe_esp.pdf`}
                 download
                 target="_blank"
                 rel="noopener noreferrer"
@@ -356,7 +356,7 @@ export function PanelControles({
               </Box>
               <Box
                 component="a"
-                href={`${import.meta.env.BASE_URL}informe_english_27oct.pdf`}
+                href={`${import.meta.env.BASE_URL}informe_english.pdf`}
                 download
                 target="_blank"
                 rel="noopener noreferrer"
